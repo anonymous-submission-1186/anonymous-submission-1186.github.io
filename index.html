@@ -1,0 +1,3152 @@
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ATAS: Any Time, Any Space: A World-State-Centric Framework for Agentic Video Generation</title>
+    <meta name="description" content="Video results for ATAS: a world-state-centric framework for agentic video generation.">
+    <meta name="theme-color" content="#000000">
+    <link rel="icon" href="data:,">
+    <style>*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #000;
+  --text: #fff;
+  --muted: #b7b7bd;
+  --dim: #7f828a;
+  --accent: #f6f1df;
+  --blue: #61a5ff;
+  --pink: #d660c8;
+  --grad: linear-gradient(135deg, #61a5ff, #d660c8);
+  --grad-3: linear-gradient(90deg, #61a5ff, #d660c8 55%, #f6f1df);
+  --sans: "Outfit", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", "Helvetica Neue",
+    Helvetica, Arial, "Noto Sans", sans-serif;
+  --serif: "Playfair Display", "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --bleed: min(1680px, calc(100vw - 36px));
+  color-scheme: dark;
+}
+
+html {
+  background: var(--bg);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 720px at 50% -180px, rgba(97, 165, 255, 0.24), transparent 70%),
+    radial-gradient(900px 620px at 88% 380px, rgba(214, 96, 200, 0.16), transparent 70%),
+    radial-gradient(760px 520px at 8% 640px, rgba(246, 241, 223, 0.07), transparent 70%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(214, 96, 200, 0.45);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(97, 165, 255, 0.9);
+  outline-offset: 3px;
+}
+
+a {
+  color: #dfe6f1;
+}
+
+.aurora {
+  animation: drift 40s var(--ease) infinite alternate;
+  background:
+    radial-gradient(38vw 30vw at 18% 30%, rgba(97, 165, 255, 0.075), transparent 70%),
+    radial-gradient(34vw 28vw at 82% 64%, rgba(214, 96, 200, 0.07), transparent 70%),
+    radial-gradient(30vw 22vw at 50% 100%, rgba(246, 241, 223, 0.035), transparent 70%);
+  inset: -10vh -10vw;
+  pointer-events: none;
+  position: fixed;
+  will-change: transform;
+  z-index: 0;
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(-1.5vw, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(1.5vw, -2vh, 0) scale(1.06);
+  }
+}
+
+.container {
+  margin: 0 auto;
+  max-width: 1280px;
+  padding: 0 24px 56px;
+  position: relative;
+  z-index: 1;
+}
+
+.masthead {
+  padding: 96px 0 64px;
+  text-align: center;
+}
+
+h1 {
+  font-size: clamp(36px, 5.2vw, 72px);
+  font-weight: 760;
+  letter-spacing: -0.02em;
+  line-height: 1.04;
+  margin: 0 auto 26px;
+  max-width: 1120px;
+}
+
+h1 span {
+  display: block;
+}
+
+h1 .nowrap {
+  display: inline;
+  white-space: nowrap;
+}
+
+.wordmark {
+  background: var(--grad-3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  font-weight: 800;
+  letter-spacing: 0.34em;
+  padding-left: 0.34em;
+}
+
+h1 .wordmark {
+  filter: drop-shadow(0 8px 30px rgba(97, 165, 255, 0.3));
+  font-size: 0.5em;
+  margin-bottom: 22px;
+}
+
+.h1-soft {
+  background: linear-gradient(180deg, #fff 12%, rgba(246, 241, 223, 0.8));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding-bottom: 0.06em;
+}
+
+.authors {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.jump-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.jump-links a {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  color: #cbd7e8;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 8px 16px;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color 0.25s var(--ease), border-color 0.25s var(--ease), color 0.25s var(--ease),
+    transform 0.25s var(--ease);
+}
+
+.jump-links a:hover {
+  background: rgba(97, 165, 255, 0.12);
+  border-color: rgba(97, 165, 255, 0.5);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.premiere-kicker {
+  color: #b9c7dc;
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: 0.16em;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.premiere-heading {
+  margin: 0 auto 34px;
+  max-width: 980px;
+  text-align: center;
+}
+
+.premiere-heading h2,
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(32px, 4vw, 50px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.scene-subtitle {
+  color: #d8dce4;
+  font-size: clamp(16px, 1.5vw, 19px);
+  font-weight: 450;
+  line-height: 1.6;
+  margin: 16px auto 22px;
+  max-width: 760px;
+}
+
+.premiere-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  justify-content: center;
+}
+
+.premiere-tags span {
+  background: rgba(255, 255, 255, 0.085);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  color: #edf4ff;
+  font-size: 13px;
+  font-weight: 650;
+  padding: 7px 13px;
+}
+
+.premiere-tags b {
+  color: #fff;
+  font-family: var(--mono);
+  font-weight: 700;
+  margin-right: 5px;
+}
+
+.scene-hero {
+  position: relative;
+}
+
+.premiere-stage {
+  background:
+    linear-gradient(90deg, transparent, rgba(97, 165, 255, 0.34), rgba(214, 96, 200, 0.28), transparent) top / 100% 1px no-repeat,
+    radial-gradient(circle at 14% 6%, rgba(97, 165, 255, 0.2), transparent 24%),
+    radial-gradient(circle at 88% 9%, rgba(214, 96, 200, 0.18), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.016));
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 22px;
+  box-shadow:
+    0 44px 120px rgba(0, 0, 0, 0.5),
+    0 22px 90px rgba(97, 165, 255, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  margin-left: calc(50% - var(--bleed) / 2);
+  padding: 26px;
+  width: var(--bleed);
+}
+
+.hero-card {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(97, 165, 255, 0.26), transparent 30%),
+    radial-gradient(circle at 84% 4%, rgba(214, 96, 200, 0.18), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.078), rgba(255, 255, 255, 0.018));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  box-shadow:
+    0 34px 96px rgba(0, 0, 0, 0.54),
+    0 0 0 1px rgba(97, 165, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  padding: 24px;
+  position: relative;
+}
+
+.hero-frame {
+  aspect-ratio: 16 / 9;
+  background: #030405;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 34px 110px rgba(0, 0, 0, 0.52);
+  max-height: 82vh;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.hero-frame video {
+  background: #000;
+  display: block;
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.play-overlay {
+  appearance: none;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.18), transparent 60%);
+  border: 0;
+  cursor: pointer;
+  display: grid;
+  inset: 0;
+  place-items: center;
+  position: absolute;
+  transition: opacity 0.3s var(--ease);
+}
+
+.play-overlay .disc {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  background: rgba(10, 12, 18, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 6px rgba(255, 255, 255, 0.07),
+    0 12px 34px rgba(0, 0, 0, 0.5);
+  color: #fff;
+  display: grid;
+  height: 50px;
+  place-items: center;
+  transition: transform 0.35s var(--ease), background 0.35s var(--ease), border-color 0.35s var(--ease),
+    box-shadow 0.35s var(--ease);
+  width: 50px;
+}
+
+.play-overlay svg {
+  height: 18px;
+  margin-left: 3px;
+  width: 18px;
+}
+
+.play-overlay:hover .disc,
+.play-overlay:focus-visible .disc {
+  background: linear-gradient(135deg, rgba(97, 165, 255, 0.9), rgba(214, 96, 200, 0.9));
+  border-color: transparent;
+  box-shadow: 0 14px 40px rgba(214, 96, 200, 0.35);
+  transform: scale(1.08);
+}
+
+.hero-frame .play-overlay .disc {
+  height: 86px;
+  width: 86px;
+}
+
+.hero-frame .play-overlay svg {
+  height: 30px;
+  margin-left: 5px;
+  width: 30px;
+}
+
+.engaged > .play-overlay {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.visit-timeline {
+  margin-top: 22px;
+  position: relative;
+}
+
+.visit-timeline[hidden] {
+  display: none;
+}
+
+.vt-head {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.vt-title {
+  color: #cbd7e8;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.vt-legend {
+  color: #aeb5c2;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+  gap: 6px 18px;
+}
+
+.vt-legend span {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.vt-legend i {
+  background: rgb(var(--room-rgb));
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(var(--room-rgb), 0.8);
+  height: 8px;
+  width: 8px;
+}
+
+.rv-icon {
+  color: var(--accent);
+  flex: none;
+  height: 13px;
+  width: 13px;
+}
+
+.vt-scroll {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.vt-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.vt-inner {
+  min-width: 560px;
+  position: relative;
+}
+
+.can-scroll:not(.at-end) {
+  -webkit-mask-image: linear-gradient(90deg, #000 86%, transparent);
+  mask-image: linear-gradient(90deg, #000 86%, transparent);
+}
+
+.vt-handoffs {
+  height: 44px;
+  position: relative;
+}
+
+.vt-chip {
+  align-items: center;
+  appearance: none;
+  background: rgba(8, 10, 15, 0.92);
+  border: 1px solid rgba(246, 241, 223, 0.28);
+  border-radius: 999px;
+  color: var(--accent);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 750;
+  gap: 8px;
+  height: 28px;
+  letter-spacing: 0.08em;
+  padding: 0 11px 0 10px;
+  position: absolute;
+  text-transform: uppercase;
+  top: 0;
+  transition: border-color 0.25s var(--ease), background-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+  white-space: nowrap;
+}
+
+.vt-chip:hover,
+.vt-chip.near {
+  background: rgba(32, 28, 22, 0.96);
+  border-color: rgba(246, 241, 223, 0.72);
+  box-shadow: 0 0 24px rgba(246, 241, 223, 0.18);
+}
+
+.vt-chip::after {
+  background: linear-gradient(rgba(246, 241, 223, 0.75), rgba(246, 241, 223, 0));
+  content: "";
+  height: 16px;
+  left: var(--tick, 50%);
+  position: absolute;
+  top: 100%;
+  width: 1px;
+}
+
+.vt-chip .dia {
+  background: var(--grad);
+  border-radius: 1.5px;
+  box-shadow: 0 0 10px rgba(214, 96, 200, 0.8);
+  flex: none;
+  height: 8px;
+  transform: rotate(45deg);
+  width: 8px;
+}
+
+.vt-chip time {
+  color: #aeb5c2;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.visit-timeline.compact .vt-chip .lbl {
+  display: none;
+}
+
+.vt-track {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  height: 72px;
+  overflow: hidden;
+  position: relative;
+}
+
+.vt-seg {
+  appearance: none;
+  background: linear-gradient(180deg, rgba(var(--room-rgb), 0.17), rgba(var(--room-rgb), 0.03) 85%);
+  border: 0;
+  bottom: 0;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  overflow: hidden;
+  padding: 14px 14px 10px;
+  position: absolute;
+  text-align: left;
+  top: 0;
+  transition: background 0.3s var(--ease);
+}
+
+.vt-seg + .vt-seg {
+  box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.65);
+}
+
+.vt-seg::before {
+  background: rgb(var(--room-rgb));
+  content: "";
+  height: 3px;
+  left: 0;
+  opacity: 0.85;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.vt-seg:hover,
+.vt-seg.active {
+  background: linear-gradient(180deg, rgba(var(--room-rgb), 0.32), rgba(var(--room-rgb), 0.07) 85%);
+}
+
+.vt-seg strong {
+  align-items: center;
+  display: flex;
+  font-size: 14px;
+  font-weight: 700;
+  gap: 7px;
+  line-height: 1.25;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.vt-seg strong span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vt-seg small {
+  color: #aeb5c2;
+  display: block;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  margin-top: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.again {
+  background: var(--grad);
+  border-radius: 999px;
+  color: #fff;
+  flex: none;
+  font-family: var(--sans);
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 2px 7px;
+  text-transform: uppercase;
+}
+
+.vt-band {
+  background: repeating-linear-gradient(135deg, rgba(246, 241, 223, 0.16) 0 5px, transparent 5px 11px);
+  bottom: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+}
+
+.vt-boundary {
+  background: linear-gradient(180deg, #f6f1df, rgba(246, 241, 223, 0.15));
+  bottom: 0;
+  box-shadow: 0 0 14px rgba(246, 241, 223, 0.55);
+  margin-left: -1px;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 2px;
+}
+
+.vt-progress {
+  background: var(--grad-3);
+  bottom: 0;
+  height: 3px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 0;
+}
+
+.vt-playhead {
+  background: #fff;
+  bottom: 0;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.85);
+  left: 0;
+  margin-left: -1px;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  transition: opacity 0.3s;
+  width: 2px;
+}
+
+.visit-timeline.started .vt-playhead {
+  opacity: 1;
+}
+
+.vt-preview {
+  aspect-ratio: 16 / 9;
+  background: #0b0d11 center / cover no-repeat;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transform: translateY(6px) scale(0.97);
+  transition: opacity 0.18s var(--ease), transform 0.18s var(--ease);
+  width: 240px;
+  z-index: 20;
+}
+
+.vt-preview.show {
+  opacity: 1;
+  transform: none;
+}
+
+.vt-preview span {
+  bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  left: 10px;
+  position: absolute;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
+}
+
+.plan-preview {
+  background:
+    radial-gradient(circle at 50% 8%, rgba(246, 241, 223, 0.12), transparent 23%),
+    radial-gradient(circle at 82% 17%, rgba(214, 96, 200, 0.2), transparent 30%),
+    radial-gradient(circle at 18% 20%, rgba(97, 165, 255, 0.22), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.018));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 22px;
+  box-shadow:
+    0 54px 150px rgba(97, 165, 255, 0.12),
+    0 48px 145px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  margin: 120px 0 0 calc(50% - var(--bleed) / 2);
+  overflow: hidden;
+  padding: 0 0 30px;
+  position: relative;
+  width: var(--bleed);
+}
+
+.plan-preview::before {
+  background: linear-gradient(90deg, transparent, rgba(97, 165, 255, 0.72), rgba(214, 96, 200, 0.66), transparent);
+  content: "";
+  height: 2px;
+  left: 5%;
+  position: absolute;
+  right: 5%;
+  top: 0;
+}
+
+.preview-copy {
+  margin: 0 auto;
+  max-width: 940px;
+  padding: 48px 20px 34px;
+  text-align: center;
+}
+
+.preview-copy h2 {
+  font-size: clamp(30px, 3.4vw, 48px);
+  font-weight: 650;
+  line-height: 1.04;
+}
+
+.preview-copy h2 span {
+  display: block;
+}
+
+.preview-copy h2 span:first-child {
+  color: rgba(236, 240, 247, 0.92);
+  text-shadow: 0 16px 52px rgba(0, 0, 0, 0.28);
+}
+
+.preview-copy h2 span + span {
+  color: #cbd7e8;
+  font-size: 0.4em;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin-top: 16px;
+  text-transform: uppercase;
+}
+
+.preview-copy p {
+  color: #c1c8d4;
+  font-size: clamp(15px, 1.2vw, 17.5px);
+  font-weight: 450;
+  margin: 18px auto 0;
+  max-width: 760px;
+}
+
+.world-scroll {
+  overflow-x: auto;
+  padding: 10px 24px 6px;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  scrollbar-width: thin;
+}
+
+.world-inner {
+  min-width: 880px;
+  position: relative;
+}
+
+.wt-row {
+  display: flex;
+  gap: 28px;
+}
+
+.wt-card {
+  appearance: none;
+  background: rgba(6, 8, 12, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  flex: var(--grow) 1 0;
+  flex-direction: column;
+  font: inherit;
+  min-width: 132px;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+  text-align: left;
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease), border-color 0.35s var(--ease);
+}
+
+.wt-card::before {
+  background: rgb(var(--room-rgb));
+  content: "";
+  height: 3px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 2;
+}
+
+.wt-card.revisit {
+  background:
+    linear-gradient(#07090d, #07090d) padding-box,
+    linear-gradient(135deg, rgba(97, 165, 255, 0.95), rgba(214, 96, 200, 0.95), rgba(246, 241, 223, 0.9)) border-box;
+  border-color: transparent;
+  box-shadow: 0 16px 44px rgba(214, 96, 200, 0.14);
+}
+
+.world-state-seekable .wt-card:hover {
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(97, 165, 255, 0.3);
+  transform: translateY(-4px);
+}
+
+.plan-preview:not(.world-state-seekable) .wt-card,
+.plan-preview:not(.world-state-seekable) .rc-shot {
+  cursor: default;
+}
+
+.wt-card.playing {
+  box-shadow:
+    0 0 0 1px rgba(246, 241, 223, 0.55),
+    0 18px 48px rgba(97, 165, 255, 0.22);
+}
+
+.wt-media {
+  aspect-ratio: 16 / 9;
+  background: #0d1117;
+  display: block;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.wt-media img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease);
+  width: 100%;
+}
+
+.world-state-seekable .wt-card:hover .wt-media img {
+  transform: scale(1.045);
+}
+
+.wt-media::after {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 55%);
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+.wt-index {
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  left: 10px;
+  padding: 2px 7px;
+  position: absolute;
+  top: 12px;
+  z-index: 1;
+}
+
+.wt-media .again {
+  position: absolute;
+  right: 10px;
+  top: 12px;
+  z-index: 1;
+}
+
+.wt-body {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px 14px;
+}
+
+.wt-body strong {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wt-time {
+  color: #d5dbe5;
+  font-family: var(--mono);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.wt-visit {
+  color: #9aa1ad;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.wt-node {
+  background: #07090d;
+  border: 1px solid rgba(246, 241, 223, 0.45);
+  border-radius: 50%;
+  box-shadow: 0 0 18px rgba(214, 96, 200, 0.45);
+  color: var(--accent);
+  display: grid;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  place-items: center;
+  pointer-events: none;
+  position: absolute;
+  width: 24px;
+  z-index: 3;
+}
+
+.wt-node svg {
+  height: 12px;
+  width: 12px;
+}
+
+.wt-link {
+  background: repeating-linear-gradient(180deg, rgba(246, 241, 223, 0.42) 0 4px, transparent 4px 8px);
+  margin-left: -0.5px;
+  pointer-events: none;
+  position: absolute;
+  width: 1px;
+  z-index: 2;
+}
+
+.wt-axis {
+  height: 42px;
+  margin-top: 36px;
+  position: relative;
+}
+
+.wt-axis::before {
+  background: linear-gradient(90deg, rgba(97, 165, 255, 0.65), rgba(214, 96, 200, 0.6), rgba(246, 241, 223, 0.55));
+  content: "";
+  height: 1px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 8px;
+}
+
+.wt-tick {
+  align-items: center;
+  color: #9aa1ad;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  gap: 6px;
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.wt-tick::before {
+  background: #0a0c10;
+  border: 2px solid rgba(246, 241, 223, 0.75);
+  border-radius: 50%;
+  content: "";
+  height: 11px;
+  margin-top: 3px;
+  width: 11px;
+}
+
+.wt-tick.first {
+  align-items: flex-start;
+  transform: none;
+}
+
+.wt-tick.last {
+  align-items: flex-end;
+  transform: translateX(-100%);
+}
+
+.wt-tick.handoff {
+  color: var(--accent);
+}
+
+.wt-tick.handoff::before {
+  background: var(--grad);
+  border-color: transparent;
+  box-shadow: 0 0 12px rgba(214, 96, 200, 0.7);
+}
+
+.wt-axis-label {
+  color: #7f828a;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  position: absolute;
+  right: 0;
+  text-transform: uppercase;
+  top: -24px;
+}
+
+.revisit-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 14px 24px 0;
+}
+
+.revisit-card {
+  background:
+    radial-gradient(circle at 10% 0%, rgba(214, 96, 200, 0.16), transparent 42%),
+    radial-gradient(circle at 96% 10%, rgba(97, 165, 255, 0.14), transparent 40%),
+    linear-gradient(180deg, rgba(10, 13, 19, 0.92), rgba(6, 7, 10, 0.92));
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 16px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 20px 60px rgba(0, 0, 0, 0.4);
+  padding: 20px 20px 22px;
+}
+
+.rc-kicker {
+  align-items: center;
+  color: #cbd7e8;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 11.5px;
+  font-weight: 800;
+  gap: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.rc-kicker i {
+  background: rgb(var(--room-rgb));
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(var(--room-rgb), 0.8);
+  height: 8px;
+  width: 8px;
+}
+
+.rc-kicker time {
+  color: #9aa1ad;
+  font-family: var(--mono);
+  letter-spacing: 0;
+}
+
+.rc-title {
+  font-family: var(--serif);
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 8px 0 4px;
+}
+
+.rc-sub {
+  color: #aeb5c2;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.rc-strip {
+  align-items: start;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) 20px minmax(0, 1fr) 20px minmax(0, 1fr);
+}
+
+.rc-arrow {
+  align-self: center;
+  color: var(--accent);
+  display: grid;
+  margin-top: -34px;
+  opacity: 0.7;
+  place-items: center;
+}
+
+.rc-arrow svg {
+  height: 18px;
+  width: 18px;
+}
+
+.rc-shot {
+  appearance: none;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.rc-shot.static {
+  cursor: default;
+}
+
+.rc-shot .frame {
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  display: block;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.3s var(--ease), border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+
+.rc-shot img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.world-state-seekable .rc-shot:not(.static):hover .frame {
+  border-color: rgba(97, 165, 255, 0.65);
+  box-shadow: 0 14px 34px rgba(97, 165, 255, 0.16);
+  transform: translateY(-2px);
+}
+
+.rc-shot.projection .frame {
+  border-color: rgba(97, 165, 255, 0.5);
+  box-shadow:
+    0 0 0 1px rgba(97, 165, 255, 0.18),
+    0 12px 34px rgba(97, 165, 255, 0.16);
+}
+
+.rc-shot .cap {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.35;
+  margin-top: 8px;
+}
+
+.rc-shot .cap b {
+  color: #fff;
+  display: block;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+}
+
+.rc-shot .cap b time {
+  color: #8f96a3;
+  font-family: var(--mono);
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.rc-shot .cap span {
+  color: #aeb5c2;
+  display: block;
+  margin-top: 2px;
+}
+
+.rc-changes {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  margin-top: 16px;
+  padding-top: 14px;
+}
+
+.rc-changes li {
+  color: #e6e9ef;
+  font-size: 14px;
+  line-height: 1.5;
+  padding-left: 20px;
+  position: relative;
+}
+
+.rc-changes li::before {
+  background: var(--grad);
+  border-radius: 2px;
+  content: "";
+  height: 7px;
+  left: 3px;
+  position: absolute;
+  top: 0.6em;
+  transform: rotate(45deg);
+  width: 7px;
+}
+
+.comparison-section {
+  padding-top: 120px;
+}
+
+.section-head {
+  margin: 0 auto 34px;
+  max-width: 980px;
+  text-align: center;
+}
+
+.section-head p {
+  color: #d3d8e0;
+  font-size: clamp(15px, 1.3vw, 17.5px);
+  font-weight: 450;
+  margin: 16px auto 0;
+  max-width: 820px;
+}
+
+.comparison-legend {
+  align-items: center;
+  background: rgba(11, 12, 15, 0.86);
+  border: 1px solid #282d33;
+  border-radius: 999px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 26px;
+  max-width: 100%;
+  padding: 7px 9px;
+}
+
+.comparison-legend span,
+.comparison-legend strong {
+  border-radius: 999px;
+  color: #d9d9df;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 5px 11px;
+}
+
+.comparison-legend span:first-child {
+  color: #8d929b;
+}
+
+.comparison-legend strong {
+  background: var(--grad);
+  color: #fff;
+}
+
+.comparison-wide {
+  --cmp-gap: 14px;
+  --cmp-visible: 3;
+  --case-pad: 22px;
+  margin-left: calc(50% - var(--bleed) / 2);
+  width: var(--bleed);
+}
+
+.framework-comparison {
+  display: grid;
+  gap: 40px;
+}
+
+.comparison-case {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(97, 165, 255, 0.16), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018));
+  border: 1px solid #272d34;
+  border-radius: 16px;
+  padding: 22px var(--case-pad) 24px;
+  position: relative;
+}
+
+.case-head {
+  align-items: end;
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin-bottom: 22px;
+}
+
+.case-head h3 {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 25px;
+  font-weight: 650;
+  gap: 4px 14px;
+  line-height: 1.2;
+}
+
+.case-head h3 small {
+  color: #91bfff;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.case-premise {
+  -webkit-box-orient: vertical;
+  color: #aeb5c2;
+  display: -webkit-box;
+  font-size: 14.5px;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  margin-top: 6px;
+  max-width: 820px;
+  overflow: hidden;
+}
+
+.route {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+  max-width: 720px;
+}
+
+.route span {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  color: #dfe4ec;
+  font-size: 12px;
+  font-weight: 650;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.route span.again-stop {
+  align-items: center;
+  background: rgba(214, 96, 200, 0.12);
+  border-color: rgba(214, 96, 200, 0.5);
+  display: inline-flex;
+  gap: 6px;
+}
+
+.route span.again-stop .rv-icon {
+  height: 12px;
+  width: 12px;
+}
+
+.route i {
+  color: #5d636d;
+  display: grid;
+  place-items: center;
+}
+
+.route i svg {
+  height: 12px;
+  width: 12px;
+}
+
+.route .shots {
+  background: transparent;
+  border-color: transparent;
+  color: #8d929b;
+  font-family: var(--mono);
+}
+
+.method-grid {
+  align-items: start;
+  display: grid;
+  gap: var(--cmp-gap);
+}
+
+.comparison-wide .method-grid,
+.cmp-head-grid {
+  grid-template-columns: minmax(0, 2.76fr) minmax(0, 1.2fr);
+}
+
+.comparison-wide .cmp-track {
+  align-items: start;
+  display: grid;
+  gap: var(--cmp-gap);
+  grid-auto-columns: calc((100% - (var(--cmp-visible) - 1) * var(--cmp-gap)) / var(--cmp-visible));
+  grid-auto-flow: column;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.comparison-wide .cmp-track::-webkit-scrollbar {
+  display: none;
+}
+
+.comparison-wide .cmp-track.follower {
+  scroll-snap-type: none;
+}
+
+.comparison-wide .cmp-track > * {
+  scroll-snap-align: start;
+}
+
+.comparison-wide .cmp-head {
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+  background: rgba(8, 10, 14, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 14px;
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  margin-bottom: 18px;
+  padding: 10px var(--case-pad) 14px;
+  position: sticky;
+  top: 12px;
+  z-index: 30;
+}
+
+.cmp-head-grid {
+  align-items: center;
+  display: grid;
+  gap: var(--cmp-gap);
+}
+
+.cmp-head-trackwrap {
+  min-width: 0;
+  position: relative;
+}
+
+.cmp-label {
+  color: #e8ecf2;
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow: hidden;
+  padding: 9px 40px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cmp-label.ours {
+  align-items: center;
+  display: flex;
+  gap: 9px;
+  justify-content: center;
+  padding: 9px 12px;
+}
+
+.cmp-arrow {
+  align-items: center;
+  appearance: none;
+  background: rgba(12, 14, 20, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 50%;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  height: 32px;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: background 0.25s var(--ease), border-color 0.25s var(--ease), opacity 0.25s var(--ease),
+    box-shadow 0.25s var(--ease);
+  width: 32px;
+  z-index: 2;
+}
+
+.cmp-arrow.prev {
+  left: 0;
+}
+
+.cmp-arrow.next {
+  right: 0;
+}
+
+.cmp-arrow svg {
+  height: 14px;
+  width: 14px;
+}
+
+.cmp-arrow.prev svg {
+  transform: scaleX(-1);
+}
+
+.cmp-arrow:hover:not(:disabled) {
+  background: var(--grad);
+  border-color: transparent;
+  box-shadow: 0 10px 26px rgba(214, 96, 200, 0.35);
+}
+
+.cmp-arrow:disabled {
+  cursor: default;
+  opacity: 0.28;
+}
+
+.cmp-progress {
+  background: rgba(255, 255, 255, 0.09);
+  border-radius: 2px;
+  bottom: -8px;
+  height: 2px;
+  left: 44px;
+  position: absolute;
+  right: 44px;
+}
+
+.cmp-progress span {
+  background: var(--grad-3);
+  border-radius: 2px;
+  bottom: 0;
+  position: absolute;
+  top: 0;
+  transition: left 0.2s linear, width 0.2s linear;
+}
+
+.method-card {
+  background: #090a0c;
+  border: 1px solid #252a30;
+  border-radius: 10px;
+  padding: 11px;
+  position: relative;
+  transition: border-color 0.3s var(--ease);
+}
+
+.method-card:hover {
+  border-color: #3a414b;
+}
+
+.method-card.ours {
+  background:
+    linear-gradient(#080b10, #080b10) padding-box,
+    linear-gradient(135deg, #61a5ff, #d660c8, #f6f1df) border-box;
+  border: 1px solid transparent;
+  box-shadow:
+    0 0 0 1px rgba(97, 165, 255, 0.3),
+    0 22px 58px rgba(97, 165, 255, 0.16);
+  transform: translateY(-6px);
+}
+
+.ours-badge {
+  background: var(--grad);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 3px 9px;
+}
+
+.media {
+  aspect-ratio: 16 / 9;
+  background: #0d1014;
+  border-radius: 7px;
+  overflow: hidden;
+  position: relative;
+}
+
+.media video {
+  background: #000;
+  display: block;
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.cell-meta {
+  align-items: center;
+  color: #9aa1ad;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 12px;
+  gap: 6px;
+  justify-content: space-between;
+  margin-top: 9px;
+  min-height: 22px;
+}
+
+.cell-meta .dur {
+  color: #cfd6e2;
+  font-family: var(--mono);
+}
+
+.cell-meta .count {
+  font-family: var(--mono);
+}
+
+.cell-meta .state {
+  align-items: center;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  max-width: 100%;
+}
+
+.badge-progress {
+  align-items: center;
+  background: rgba(246, 241, 223, 0.07);
+  border: 1px solid rgba(246, 241, 223, 0.3);
+  border-radius: 999px;
+  color: var(--accent);
+  display: inline-flex;
+  font-size: 10px;
+  font-weight: 800;
+  gap: 6px;
+  letter-spacing: 0.1em;
+  padding: 3px 8px;
+  text-transform: uppercase;
+}
+
+.badge-progress::before {
+  animation: pulse 1.8s ease-in-out infinite;
+  background: var(--accent);
+  border-radius: 50%;
+  content: "";
+  height: 6px;
+  width: 6px;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.placeholder {
+  align-content: center;
+  animation: shimmer 2.6s linear infinite;
+  background:
+    linear-gradient(110deg, rgba(255, 255, 255, 0.02) 30%, rgba(255, 255, 255, 0.075) 45%, rgba(255, 255, 255, 0.02) 60%) 0 0 / 250% 100%,
+    radial-gradient(circle at 30% 20%, rgba(97, 165, 255, 0.14), transparent 55%),
+    radial-gradient(circle at 80% 90%, rgba(214, 96, 200, 0.1), transparent 55%),
+    #0a0c10;
+  display: grid;
+  gap: 6px;
+  inset: 0;
+  justify-items: center;
+  position: absolute;
+  text-align: center;
+}
+
+.placeholder .badge-progress {
+  font-size: 11px;
+  padding: 5px 11px;
+}
+
+.placeholder small {
+  color: #7f828a;
+  font-size: 12px;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 150% 0, 0 0, 0 0, 0 0;
+  }
+  to {
+    background-position: -100% 0, 0 0, 0 0, 0 0;
+  }
+}
+
+.evidence {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(217, 91, 33, 0.13), transparent 48%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px;
+}
+
+.evidence.strength {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(214, 96, 200, 0.17), transparent 48%),
+    radial-gradient(circle at 94% 6%, rgba(97, 165, 255, 0.17), transparent 46%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  border-color: rgba(97, 165, 255, 0.32);
+}
+
+.ev-heading {
+  align-items: center;
+  color: #fff;
+  display: flex;
+  font-size: 11px;
+  font-weight: 850;
+  gap: 9px;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  padding: 2px 2px 0;
+  text-transform: uppercase;
+}
+
+.ev-heading::before {
+  background: #e0713d;
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(224, 113, 61, 0.75);
+  content: "";
+  flex: none;
+  height: 7px;
+  transform: rotate(45deg);
+  width: 7px;
+}
+
+.evidence.strength .ev-heading::before {
+  background: var(--grad);
+  box-shadow: 0 0 10px rgba(214, 96, 200, 0.75);
+}
+
+.ev-heading span {
+  color: #7f828a;
+  font-family: var(--mono);
+  font-weight: 600;
+  letter-spacing: 0;
+  margin-left: auto;
+}
+
+.ev-item {
+  appearance: none;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(217, 91, 33, 0.3);
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  font: inherit;
+  gap: 8px;
+  padding: 6px 6px 9px;
+  text-align: left;
+  transition: background-color 0.25s var(--ease), border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+  width: 100%;
+}
+
+.ev-item.compare {
+  cursor: default;
+}
+
+.evidence.strength .ev-item {
+  border-color: rgba(97, 165, 255, 0.36);
+}
+
+button.ev-item:hover,
+.ev-item.compare:hover {
+  background: rgba(255, 255, 255, 0.055);
+  border-color: rgba(217, 91, 33, 0.62);
+}
+
+.evidence.strength button.ev-item:hover,
+.evidence.strength .ev-item.compare:hover {
+  border-color: rgba(97, 165, 255, 0.72);
+}
+
+.ev-item.current {
+  box-shadow:
+    0 0 0 1px rgba(246, 241, 223, 0.6),
+    0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+.ev-thumb,
+.ev-shot {
+  aspect-ratio: 16 / 9;
+  background: #0d1014;
+  border-radius: 5px;
+  display: block;
+  overflow: hidden;
+  position: relative;
+}
+
+.ev-thumb img,
+.ev-shot img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.45s var(--ease);
+  width: 100%;
+}
+
+button.ev-item:hover .ev-thumb img,
+.ev-shot:hover img {
+  transform: scale(1.045);
+}
+
+.ev-marks {
+  filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.55));
+  height: 100%;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+  position: absolute;
+  transform-origin: 50% 50%;
+  transition: transform 0.45s var(--ease);
+  width: 100%;
+}
+
+.ev-marks ellipse {
+  fill: none;
+  stroke: #ff3b30;
+  stroke-width: 3px;
+  vector-effect: non-scaling-stroke;
+}
+
+button.ev-item:hover .ev-thumb .ev-marks,
+.ev-shot:hover .ev-marks {
+  transform: scale(1.045);
+}
+
+.ev-pair {
+  display: grid;
+  gap: 5px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ev-shot {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ev-shot::after {
+  border: 1px solid transparent;
+  border-radius: 5px;
+  content: "";
+  inset: 0;
+  position: absolute;
+  transition: border-color 0.25s var(--ease);
+}
+
+.ev-shot:hover::after,
+.ev-shot:focus-visible::after {
+  border-color: rgba(255, 255, 255, 0.85);
+}
+
+.ev-shot em {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.74);
+  border-radius: 4px;
+  bottom: 4px;
+  color: #e3e7ee;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 600;
+  left: 4px;
+  line-height: 1;
+  padding: 3px 6px;
+  position: absolute;
+}
+
+.ev-shot em b {
+  color: #fff;
+  font-family: var(--sans);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin-right: 5px;
+  text-transform: uppercase;
+}
+
+.ev-copy {
+  appearance: none;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  padding: 0 2px;
+  text-align: left;
+  width: 100%;
+}
+
+.ev-copy strong {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.32;
+}
+
+.ev-copy strong time,
+.ev-preview-copy strong time {
+  color: #f0a37e;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  margin-right: 7px;
+}
+
+.ev-preview-copy strong time {
+  color: #9aa1ad;
+}
+
+.ev-copy strong time,
+.ev-preview-copy strong time {
+  margin-right: 0;
+}
+
+.ev-copy strong time::after,
+.ev-preview-copy strong time::after {
+  color: #6f7682;
+  content: "·";
+  font-family: var(--sans);
+  margin: 0 6px;
+}
+
+.evidence.strength .ev-copy strong time {
+  color: #9cc6ff;
+}
+
+.ev-copy small {
+  color: #aeb5c2;
+  display: block;
+  font-size: 11.5px;
+  line-height: 1.42;
+  margin-top: 4px;
+}
+
+.ev-more,
+.more-frames {
+  display: block;
+}
+
+.ev-more > .ev-item {
+  margin-top: 8px;
+}
+
+.ev-more > summary,
+.more-frames > summary {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #cfd4df;
+  cursor: pointer;
+  display: flex;
+  font-size: 11.5px;
+  font-weight: 800;
+  gap: 8px;
+  justify-content: center;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  list-style: none;
+  padding: 8px 10px;
+  transition: background-color 0.25s var(--ease), border-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+.ev-more > summary::-webkit-details-marker,
+.more-frames > summary::-webkit-details-marker {
+  display: none;
+}
+
+.ev-more > summary::after,
+.more-frames > summary::after {
+  border-bottom: 1.5px solid currentColor;
+  border-right: 1.5px solid currentColor;
+  content: "";
+  height: 6px;
+  margin-top: -3px;
+  transform: rotate(45deg);
+  transition: transform 0.3s var(--ease), margin 0.3s var(--ease);
+  width: 6px;
+}
+
+.ev-more[open] > summary::after,
+.more-frames[open] > summary::after {
+  margin-top: 3px;
+  transform: rotate(-135deg);
+}
+
+.ev-more > summary:hover,
+.more-frames > summary:hover,
+.ev-more[open] > summary,
+.more-frames[open] > summary {
+  border-color: rgba(97, 165, 255, 0.4);
+  color: #fff;
+}
+
+.more-frames {
+  margin-top: 10px;
+}
+
+.more-frames > summary em {
+  color: #7f828a;
+  font-family: var(--mono);
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.frame-strip {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 8px;
+}
+
+.frame-chip {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #d9dde6;
+  cursor: pointer;
+  font: inherit;
+  overflow: hidden;
+  padding: 0;
+  text-align: left;
+  transition: border-color 0.25s var(--ease), background-color 0.25s var(--ease);
+}
+
+.frame-chip:hover {
+  background: rgba(97, 165, 255, 0.08);
+  border-color: rgba(97, 165, 255, 0.55);
+}
+
+.frame-chip img {
+  aspect-ratio: 16 / 9;
+  display: block;
+  object-fit: cover;
+  width: 100%;
+}
+
+.frame-chip span {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 6px 4px;
+}
+
+.ev-preview {
+  background: #07090d;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.72);
+  left: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  transform: translateY(6px) scale(0.98);
+  transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
+  width: 360px;
+  z-index: 100;
+}
+
+.ev-preview.show {
+  opacity: 1;
+  transform: none;
+}
+
+.ev-preview-img {
+  aspect-ratio: 16 / 9;
+  background: #0d1014 center / cover no-repeat;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.ev-preview-copy {
+  padding: 10px 12px 12px;
+}
+
+.ev-preview-copy strong {
+  display: block;
+  font-size: 13px;
+  line-height: 1.32;
+}
+
+.ev-preview-copy small {
+  color: #b6bcc7;
+  display: block;
+  font-size: 12px;
+  line-height: 1.45;
+  margin-top: 5px;
+}
+
+.ev-preview.no-text small {
+  display: none;
+}
+
+.site-footer {
+  align-items: end;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #9aa1ad;
+  display: grid;
+  font-size: 14px;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin-top: 120px;
+  padding-top: 32px;
+}
+
+.footer-mark {
+  align-items: baseline;
+  color: #d9dde5;
+  display: flex;
+  font-weight: 650;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.wordmark.small {
+  font-size: 15px;
+  letter-spacing: 0.3em;
+  padding-left: 0.06em;
+}
+
+.site-footer p {
+  line-height: 1.6;
+  max-width: 760px;
+}
+
+.footer-side {
+  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.to-top {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  color: #cbd7e8;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 6px 13px;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+.to-top:hover {
+  border-color: rgba(97, 165, 255, 0.55);
+  color: #fff;
+}
+
+.js .reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+}
+
+.js .reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 1180px) {
+  .comparison-wide {
+    --cmp-visible: 2;
+  }
+
+  .comparison-wide .method-grid,
+  .cmp-head-grid {
+    grid-template-columns: minmax(0, 1.84fr) minmax(0, 1.2fr);
+  }
+
+  .method-card.ours {
+    transform: none;
+  }
+
+  .case-head {
+    align-items: start;
+    grid-template-columns: 1fr;
+  }
+
+  .route {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 860px) {
+  .revisit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vt-seg small {
+    display: none;
+  }
+
+  .vt-track {
+    height: 52px;
+  }
+}
+
+@media (max-width: 720px) {
+  .container {
+    padding: 0 14px 48px;
+  }
+
+  .masthead {
+    padding: 64px 0 40px;
+  }
+
+  .premiere-stage {
+    border-radius: 16px;
+    padding: 10px;
+  }
+
+  .hero-card {
+    padding: 14px;
+  }
+
+  .comparison-wide {
+    --cmp-gap: 10px;
+    --cmp-visible: 1;
+    --case-pad: 12px;
+  }
+
+  .comparison-wide .method-grid,
+  .cmp-head-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .cmp-label {
+    font-size: 13px;
+    padding: 9px 30px;
+  }
+
+  .cmp-label.ours {
+    padding: 9px 6px;
+  }
+
+  .cmp-arrow {
+    height: 28px;
+    width: 28px;
+  }
+
+  .cmp-progress {
+    left: 34px;
+    right: 34px;
+  }
+
+  .site-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-side {
+    align-items: flex-start;
+  }
+
+  .rc-strip {
+    grid-template-columns: minmax(0, 1fr) 14px minmax(0, 1fr) 14px minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .rc-shot .cap span {
+    display: none;
+  }
+
+  .hero-frame .play-overlay .disc {
+    height: 60px;
+    width: 60px;
+  }
+
+  .hero-frame .play-overlay svg {
+    height: 22px;
+    margin-left: 4px;
+    width: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .aurora,
+  .placeholder,
+  .badge-progress::before {
+    animation: none;
+  }
+
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+</style>
+  </head>
+  <body>
+    <div class="aurora" aria-hidden="true"></div>
+    <div class="container">
+      <header class="masthead" id="top">
+        <h1 class="reveal">
+          <span class="wordmark">ATAS</span>
+          <span>Any Time, Any Space:</span>
+          <span class="h1-soft">A <span class="nowrap">World-State-Centric</span> Framework for Agentic Video Generation</span>
+        </h1>
+        <div class="authors reveal"><span>Anonymous Authors</span></div>
+        <nav class="jump-links reveal" aria-label="Sections">
+          <a href="#world-state">World-State Timeline</a>
+          <a href="#comparison">Comparison</a>
+        </nav>
+      </header>
+
+      <section id="hero" class="scene-hero" aria-labelledby="hero-title">
+        <div class="premiere-heading reveal">
+          <h2 id="hero-title">Saturday Laundry in the Flat</h2>
+          <div id="heroTags" class="premiere-tags" aria-label="Scene statistics"></div>
+        </div>
+
+        <div class="premiere-stage reveal">
+          <article class="hero-card">
+            <div id="heroFrame" class="hero-frame">
+              <video id="heroVideo" playsinline muted preload="metadata"></video>
+            </div>
+            <div id="visitTimeline" class="visit-timeline"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="world-state" class="plan-preview reveal" aria-labelledby="world-title">
+        <div class="preview-copy">
+          <div class="premiere-kicker">World-State Timeline</div>
+          <h2 id="world-title"><span>Three Rooms, Five Visits</span><span>Each room keeps its state while he is away</span></h2>
+          <p>
+            Every room keeps its own world state. When he returns, the stored room is rendered from the new camera
+            as a point cloud and conditions the next shot, so what he left behind is still there.
+          </p>
+        </div>
+        <div class="world-scroll">
+          <div id="worldTrack" class="world-inner"></div>
+        </div>
+        <div id="revisits" class="revisit-grid"></div>
+      </section>
+
+      <section id="comparison" class="comparison-section" aria-labelledby="comparison-title">
+        <div class="section-head reveal">
+          <h2 id="comparison-title" class="section-title">Comparison with Other Frameworks</h2>
+          <p>Each example moves through three rooms and returns to two of them.</p>
+          <div id="comparisonLegend" class="comparison-legend" aria-label="Comparison methods"></div>
+        </div>
+        <div class="comparison-wide">
+          <div id="comparisonHead" class="cmp-head"></div>
+          <div id="frameworkComparison" class="framework-comparison"></div>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <div>
+          <div class="footer-mark"><span class="wordmark small">ATAS</span><span>Anonymous Authors</span></div>
+        </div>
+        <div class="footer-side">
+          <a href="#top" class="to-top">Back to top</a>
+        </div>
+      </footer>
+    </div>
+
+    <script type="application/json" id="pageData">{"rooms":{"living_room":{"label":"Living room","short":"Living","rgb":"97,165,255"},"laundry_room":{"label":"Laundry room","short":"Laundry","rgb":"214,96,200"},"bedroom":{"label":"Bedroom","short":"Bedroom","rgb":"246,241,223"}},"segments":[{"room":"living_room","start":0.0,"end":15.0,"visit":1,"thumb":"assets/world_state/visit_living_room_1.jpg"},{"room":"laundry_room","start":15.0,"end":45.0,"visit":1,"thumb":"assets/world_state/visit_laundry_room_1.jpg"},{"room":"bedroom","start":45.0,"end":75.0,"visit":1,"thumb":"assets/world_state/visit_bedroom_1.jpg"},{"room":"living_room","start":75.0,"end":100.0,"visit":2,"thumb":"assets/world_state/visit_living_room_2.jpg"},{"room":"laundry_room","start":100.0,"end":110.0,"visit":2,"thumb":"assets/world_state/visit_laundry_room_2.jpg"}],"revisits":[{"segment":3,"room":"living_room","headline":"The mug he left is still there","saved_at":15.0,"changes":["The empty white mug still stands on the low coffee table, where he set it down before going to the laundry room."],"left":{"t":13.0,"note":"Empty mug left on the coffee table","img":"assets/world_state/left_living_room.jpg"},"projection":{"img":"assets/world_state/projection_shot_06.jpg"},"found":{"t":78.0,"note":"The mug is still on the table","img":"assets/world_state/found_living_room.jpg"}},{"segment":4,"room":"laundry_room","headline":"The wash finished while he was away","saved_at":45.0,"changes":["The washing machine he started has stopped, its round glass door shut on wet clothes pressed against the glass.","The emptied basket and the folding drying rack, still flat against the wall, are where he left them."],"left":{"t":40.0,"note":"Machine running, basket empty, rack folded","img":"assets/world_state/left_laundry_room.jpg"},"projection":{"img":"assets/world_state/projection_shot_08.jpg"},"found":{"t":103.0,"note":"Machine stopped, wet clothes behind the glass","img":"assets/world_state/found_laundry_room.jpg"}}],"hero":{"video":"videoedit/final/atl37/ats_atl37_atas15__final__a0d6bc6b41__to110s-fff4a241c2df8e56.mp4","poster":"assets/saturday_laundry_in_the_flat/poster.jpg","duration_s":110.0,"width":3200,"height":1080,"segments":[{"start":0.0,"end":15.0},{"start":15.0,"end":45.0},{"start":45.0,"end":75.0},{"start":75.0,"end":100.0},{"start":100.0,"end":110.0}]},"methods":[{"key":"reca","label":"ReCA"},{"key":"vgot","label":"VGoT"},{"key":"mora","label":"Mora"},{"key":"movieagent","label":"MovieAgent"},{"key":"i2v_extension","label":"I2V Extension"},{"key":"ours","label":"Ours"}],"comparison":[{"id":"atl21","index":1,"title":"Dye Works Split Vat At Dawn","premise":"Overnight the big indigo vat split at its base and emptied, its dye running right along the sloping cement floor and soaking in as a dark blue stain line that reaches the foot of a standing roll of white cloth.","route":[{"place":"Vat room","again":false},{"place":"Drying hall","again":false},{"place":"Dye store","again":false},{"place":"Drying hall","again":true},{"place":"Vat room","again":true}],"shots":27,"cells":{"reca":{"src":"videoedit/final/atl21/ats_atl21_reca__final__e12697e088-f384d9a93a1eefc7.mp4","seconds":135,"done":27,"total":27,"active":false,"poster":"assets/comparison/01_dye_works_split_vat_at_dawn/reca/poster.jpg","evidence":{"items":[{"time_s":15.3,"title":"Vat room rebuilt","thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/reca/shot_04_00.30s.jpg","compare_time_s":14.6,"compare_thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/reca/shot_03_04.60s.jpg"},{"time_s":85.3,"title":"Dye store rebuilt","thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/reca/shot_18_00.30s.jpg","compare_time_s":80.3,"compare_thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/reca/shot_17_00.30s.jpg"}],"frames":[{"time_s":8.0,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/reca/shot_02_03.00s.jpg"},{"time_s":39.6,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/reca/shot_08_04.60s.jpg"},{"time_s":63.0,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/reca/shot_13_03.00s.jpg"},{"time_s":91.6,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/reca/shot_19_01.60s.jpg"},{"time_s":96.6,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/reca/shot_20_01.60s.jpg"},{"time_s":125.3,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/reca/shot_26_00.30s.jpg"}]}},"vgot":{"src":"videoedit/final/atl21/ats_atl21_vgot__final__41957add55-692d05afb676f0ae.mp4","seconds":135,"done":27,"total":27,"active":false,"poster":"assets/comparison/01_dye_works_split_vat_at_dawn/vgot/poster.jpg","evidence":{"items":[{"time_s":95.5,"title":"Wrong room on return","thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/vgot/shot_20_00.50s.jpg","compare_time_s":30.5,"compare_thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/vgot/shot_07_00.50s.jpg"}],"frames":[{"time_s":8.0,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/vgot/shot_02_03.00s.jpg"},{"time_s":41.6,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/vgot/shot_09_01.60s.jpg"},{"time_s":76.6,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/vgot/shot_16_01.60s.jpg"},{"time_s":93.0,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/vgot/shot_19_03.00s.jpg"},{"time_s":101.6,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/vgot/shot_21_01.60s.jpg"},{"time_s":128.0,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/vgot/shot_26_03.00s.jpg"}]}},"mora":{"src":"videoedit/final/atl21/ats_atl21_mora__final__21ff899e59-30db18a70b2e6d32.mp4","seconds":135,"done":27,"total":27,"active":false,"poster":"assets/comparison/01_dye_works_split_vat_at_dawn/mora/poster.jpg","evidence":{"items":[{"time_s":91.6,"title":"Runner appeared","thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/mora/shot_19_01.60s.jpg","marks":{"thumbnail":[[0.289,0.697,0.61,0.997]]},"compare_time_s":56.6,"compare_thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/mora/shot_12_01.60s.jpg"}],"frames":[{"time_s":8.0,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/mora/shot_02_03.00s.jpg"},{"time_s":39.6,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/mora/shot_08_04.60s.jpg"},{"time_s":66.6,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/mora/shot_14_01.60s.jpg"},{"time_s":93.0,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/mora/shot_19_03.00s.jpg"},{"time_s":101.6,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/mora/shot_21_01.60s.jpg"},{"time_s":119.6,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/mora/shot_24_04.60s.jpg"}]}},"movieagent":{"src":"videoedit/final/atl21/ats_atl21_movieagent__final__e36f6d05eb-57ddc1e829e99b1e.mp4","seconds":135,"done":27,"total":27,"active":false,"poster":"assets/comparison/01_dye_works_split_vat_at_dawn/movieagent/poster.jpg","evidence":{"items":[{"time_s":105.2,"title":"Vat room rebuilt","thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/movieagent/shot_22_t00.20.jpg","compare_time_s":19.8,"compare_thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/movieagent/shot_04_t04.80.jpg"}],"frames":[{"time_s":14.0,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/movieagent/shot_03_t04.00.jpg"},{"time_s":37.5,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/movieagent/shot_08_t02.50.jpg"},{"time_s":49.5,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/movieagent/shot_10_t04.50.jpg"},{"time_s":79.5,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/movieagent/shot_16_t04.50.jpg"},{"time_s":92.5,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/movieagent/shot_19_t02.50.jpg"},{"time_s":126.0,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/movieagent/shot_26_t01.00.jpg"}]}},"i2v_extension":{"src":"videoedit/final/atl21/ats_atl21_i2v_extension__final__00caa7c72f-46fc37756360e7fa.mp4","seconds":135,"done":27,"total":27,"active":false,"poster":"assets/comparison/01_dye_works_split_vat_at_dawn/i2v_extension/poster.jpg","evidence":{"items":[{"time_s":25.0,"title":"Vat room rearranged","thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/i2v_extension/shot_06_t00.00.jpg","compare_time_s":24.95,"compare_thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/i2v_extension/shot_05_t04.95.jpg"}],"frames":[{"time_s":14.0,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/i2v_extension/shot_03_t04.00.jpg"},{"time_s":37.5,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/i2v_extension/shot_08_t02.50.jpg"},{"time_s":49.5,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/i2v_extension/shot_10_t04.50.jpg"},{"time_s":79.5,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/i2v_extension/shot_16_t04.50.jpg"},{"time_s":92.5,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/i2v_extension/shot_19_t02.50.jpg"},{"time_s":126.0,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/i2v_extension/shot_26_t01.00.jpg"}]}},"ours":{"src":"atsgen/films/atl21__atas15__7805dde8e9.mp4","seconds":135,"done":11,"total":11,"active":false,"poster":"assets/comparison/01_dye_works_split_vat_at_dawn/ours/poster.jpg","evidence":{"items":[{"time_s":95.2,"title":"Vat room remembers what changed","thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/ours/shot_09_t00.20.jpg","text":"On the return the white roll still lies on the stone table where it was placed, and the big vat that was hauled out is gone, leaving a round blue stain on the spot where it stood.","compare_time_s":20.2,"compare_thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/ours/shot_02_t05.20.jpg"},{"time_s":90.2,"title":"Drying hall keeps the vat where it was laid","thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/ours/shot_08_t00.20.jpg","text":"Coming back from the dye store, the big blue vat still lies on its side on the folded cloth where it was laid, and the two doors, the curtain and the plank floor match the first visit.","compare_time_s":59.8,"compare_thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/ours/shot_05_t09.80.jpg"},{"time_s":85.2,"title":"Dye store keeps its layout and the moved box","thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/ours/shot_07_t10.20.jpg","text":"When the dyer loads the vat and sack in the next segment, the store still has the same gray walls, concrete floor and left-hand door, and the box he walked aside still stands against the right wall.","compare_time_s":69.8,"compare_thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/ours/shot_06_t09.80.jpg"}],"frames":[{"time_s":14.0,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/ours/shot_01_t14.00.jpg"},{"time_s":37.5,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/ours/shot_04_t02.50.jpg"},{"time_s":49.5,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/ours/shot_04_t14.50.jpg"},{"time_s":79.5,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/ours/shot_07_t04.50.jpg"},{"time_s":92.5,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/ours/shot_08_t02.50.jpg"},{"time_s":126.0,"thumbnail":"assets/comparison/01_dye_works_split_vat_at_dawn/ours/shot_11_t01.00.jpg"}]}}}},{"id":"atl37","index":2,"title":"Saturday Laundry In The Flat","premise":"A young man does his weekend laundry.","route":[{"place":"Living room","again":false},{"place":"Laundry room","again":false},{"place":"Bedroom","again":false},{"place":"Living room","again":true},{"place":"Laundry room","again":true}],"shots":26,"cells":{"reca":{"src":"videoedit/final/atl37/ats_atl37_reca__final__7ec4fc9f2f-5e1cbe2dd9be9d59.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/02_saturday_laundry_in_the_flat/reca/poster.jpg","evidence":{"items":[{"time_s":110.67,"title":"Laundry room rebuilt","thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/reca/shot_23_t0.67.jpg","compare_time_s":25.17,"compare_thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/reca/shot_06_t0.17.jpg"},{"time_s":67.17,"title":"Bedroom turns green","thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/reca/shot_14_t2.17.jpg","compare_time_s":63.17,"compare_thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/reca/shot_13_t3.17.jpg"},{"time_s":97.67,"title":"TV stand replaced","thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/reca/shot_20_t2.67.jpg","marks":{"thumbnail":[[0.798,0.594,1.0,0.836]],"compare_thumbnail":[[0.824,0.619,1.0,0.937]]},"compare_time_s":14.17,"compare_thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/reca/shot_03_t4.17.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/reca/shot_01_t2.50.jpg"},{"time_s":22.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/reca/shot_05_t2.50.jpg"},{"time_s":52.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/reca/shot_11_t2.50.jpg"},{"time_s":87.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/reca/shot_18_t2.50.jpg"},{"time_s":102.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/reca/shot_21_t2.50.jpg"},{"time_s":122.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/reca/shot_25_t2.50.jpg"}]}},"vgot":{"src":"videoedit/final/atl37/ats_atl37_vgot__final__b155fd96d9-ed041b7f7bd8ec5e.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/02_saturday_laundry_in_the_flat/vgot/poster.jpg","evidence":{"items":[{"time_s":86.17,"title":"Living room rearranged","thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/vgot/shot_18_t1.17.jpg","compare_time_s":0.17,"compare_thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/vgot/shot_01_t0.17.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/vgot/shot_01_t2.50.jpg"},{"time_s":22.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/vgot/shot_05_t2.50.jpg"},{"time_s":52.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/vgot/shot_11_t2.50.jpg"},{"time_s":87.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/vgot/shot_18_t2.50.jpg"},{"time_s":102.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/vgot/shot_21_t2.50.jpg"},{"time_s":122.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/vgot/shot_25_t2.50.jpg"}]}},"mora":{"src":"videoedit/final/atl37/ats_atl37_mora__final__494276265d-6daf3d8bcc2e0cab.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/02_saturday_laundry_in_the_flat/mora/poster.jpg","evidence":{"items":[{"time_s":88.67,"title":"Living room changed","thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/mora/shot_18_t3.67.jpg","compare_time_s":2.17,"compare_thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/mora/shot_01_t2.17.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/mora/shot_01_t2.50.jpg"},{"time_s":22.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/mora/shot_05_t2.50.jpg"},{"time_s":52.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/mora/shot_11_t2.50.jpg"},{"time_s":87.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/mora/shot_18_t2.50.jpg"},{"time_s":102.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/mora/shot_21_t2.50.jpg"},{"time_s":122.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/mora/shot_25_t2.50.jpg"}]}},"movieagent":{"src":"videoedit/final/atl37/ats_atl37_movieagent__final__204a32f5ee-2d7da9d9797f3b79.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/02_saturday_laundry_in_the_flat/movieagent/poster.jpg","evidence":{"items":[{"time_s":100.0,"title":"Laundry room rebuilt","thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/movieagent/shot_21_00000.jpg","compare_time_s":44.9,"compare_thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/movieagent/shot_09_04900.jpg"},{"time_s":54.9,"title":"Bedroom turns gray","thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/movieagent/shot_11_04900.jpg","compare_time_s":49.9,"compare_thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/movieagent/shot_10_04900.jpg"},{"time_s":90.0,"title":"Sofa replaced","thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/movieagent/shot_19_00000.jpg","compare_time_s":89.9,"compare_thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/movieagent/shot_18_04900.jpg"}],"frames":[{"time_s":7.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/movieagent/shot_02_02500.jpg"},{"time_s":22.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/movieagent/shot_05_02500.jpg"},{"time_s":63.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/movieagent/shot_13_03500.jpg"},{"time_s":88.75,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/movieagent/shot_18_03750.jpg"},{"time_s":108.0,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/movieagent/shot_22_03000.jpg"},{"time_s":123.75,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/movieagent/shot_25_03750.jpg"}]}},"i2v_extension":{"src":"videoedit/final/atl37/ats_atl37_i2v_extension__final__4aed09e5d1-d1ca041fc308ba71.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/02_saturday_laundry_in_the_flat/i2v_extension/poster.jpg","evidence":{"items":[{"time_s":100.0,"title":"Shelving unit appeared","thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/i2v_extension/shot_21_00000.jpg","marks":{"thumbnail":[[0.0,0.137,0.142,0.997]],"compare_thumbnail":[[0.0,0.137,0.142,0.997]]},"compare_time_s":44.9,"compare_thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/i2v_extension/shot_09_04900.jpg"}],"frames":[{"time_s":8.0,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/i2v_extension/shot_02_03000.jpg"},{"time_s":27.0,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/i2v_extension/shot_06_02000.jpg"},{"time_s":53.75,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/i2v_extension/shot_11_03750.jpg"},{"time_s":64.0,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/i2v_extension/shot_13_04000.jpg"},{"time_s":83.0,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/i2v_extension/shot_17_03000.jpg"},{"time_s":118.0,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/i2v_extension/shot_24_03000.jpg"}]}},"ours":{"src":"videoedit/final/atl37/ats_atl37_atas15__final__a0d6bc6b41__to110s-fff4a241c2df8e56.mp4","seconds":110,"done":9,"total":9,"active":false,"poster":"assets/comparison/02_saturday_laundry_in_the_flat/ours/poster.jpg","evidence":{"items":[{"time_s":87.0,"title":"Living room and mug kept on return","thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/ours/shot_06_12000.jpg","text":"Back from the laundry room and the bedroom, he sits on the same dark blue sofa with its gray throw, and the white mug he left on the coffee table is still standing there.","compare_time_s":9.0,"compare_thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/ours/shot_01_09000.jpg"},{"time_s":100.75,"title":"Laundry room kept on return","thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/ours/shot_08_00750.jpg","text":"When he comes back, the shelf still holds the blue detergent, the plant and the jar, the drying rack still stands against the wall by the door, and the washer is still shut with the laundry inside.","compare_time_s":41.25,"compare_thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/ours/shot_03_11250.jpg"}],"frames":[{"time_s":7.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/ours/shot_01_07500.jpg"},{"time_s":27.0,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/ours/shot_02_12000.jpg"},{"time_s":57.0,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/ours/shot_04_12000.jpg"},{"time_s":66.0,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/ours/shot_05_06000.jpg"},{"time_s":82.5,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/ours/shot_06_07500.jpg"},{"time_s":106.0,"thumbnail":"assets/comparison/02_saturday_laundry_in_the_flat/ours/shot_08_06000.jpg"}]}}}},{"id":"atl39","index":3,"title":"Running A Bath On A Winter Evening","premise":"A young woman, tired from working on her laptop, runs herself a bath.","route":[{"place":"Bedroom","again":false},{"place":"Bathroom","again":false},{"place":"Living room","again":false},{"place":"Bedroom","again":true},{"place":"Bathroom","again":true}],"shots":26,"cells":{"reca":{"src":"videoedit/final/atl39/ats_atl39_reca__final__3dd0e44e5e-08f3b4b304b3158c.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/03_running_a_bath_on_a_winter_evening/reca/poster.jpg","evidence":{"items":[{"time_s":100.2,"title":"Bathroom rebuilt","thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/reca/shot_21_00.20.jpg","compare_time_s":15.2,"compare_thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/reca/shot_04_00.20.jpg"},{"time_s":112.0,"title":"Tub and water changed","thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/reca/shot_23_02.00.jpg","marks":{"thumbnail":[[0.0,0.396,0.437,0.997]],"compare_thumbnail":[[0.425,0.879,0.81,1.0]]},"compare_time_s":38.0,"compare_thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/reca/shot_08_03.00.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/reca/shot_01_02.50.jpg"},{"time_s":27.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/reca/shot_06_02.50.jpg"},{"time_s":47.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/reca/shot_10_02.50.jpg"},{"time_s":77.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/reca/shot_16_02.50.jpg"},{"time_s":107.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/reca/shot_22_02.50.jpg"},{"time_s":127.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/reca/shot_26_02.50.jpg"}]}},"vgot":{"src":"videoedit/final/atl39/ats_atl39_vgot__final__d7792b8065-3ab804b553c782ae.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/03_running_a_bath_on_a_winter_evening/vgot/poster.jpg","evidence":{"items":[{"time_s":95.5,"title":"Bedroom rearranged","thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/vgot/shot_20_00.50.jpg","compare_time_s":10.5,"compare_thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/vgot/shot_03_00.50.jpg"},{"time_s":100.2,"title":"Bathroom rebuilt","thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/vgot/shot_21_00.20.jpg","compare_time_s":44.8,"compare_thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/vgot/shot_09_04.80.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/vgot/shot_01_02.50.jpg"},{"time_s":27.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/vgot/shot_06_02.50.jpg"},{"time_s":52.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/vgot/shot_11_02.50.jpg"},{"time_s":62.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/vgot/shot_13_02.50.jpg"},{"time_s":82.0,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/vgot/shot_17_02.00.jpg"},{"time_s":92.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/vgot/shot_19_02.50.jpg"}]}},"mora":{"src":"videoedit/final/atl39/ats_atl39_mora__final__a17c1da441-582d8d541c0a24b7.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/03_running_a_bath_on_a_winter_evening/mora/poster.jpg","evidence":{"items":[{"time_s":95.2,"title":"Nightstand replaced","thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/mora/shot_20_00.20.jpg","marks":{"thumbnail":[[0.657,0.491,0.743,0.55]],"compare_thumbnail":[[0.784,0.591,0.893,0.906]]},"compare_time_s":10.2,"compare_thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/mora/shot_03_00.20.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/mora/shot_01_02.50.jpg"},{"time_s":28.0,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/mora/shot_06_03.00.jpg"},{"time_s":47.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/mora/shot_10_02.50.jpg"},{"time_s":77.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/mora/shot_16_02.50.jpg"},{"time_s":107.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/mora/shot_22_02.50.jpg"},{"time_s":127.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/mora/shot_26_02.50.jpg"}]}},"movieagent":{"src":"videoedit/final/atl39/ats_atl39_movieagent__final__aede371d61-a939fcaef9666650.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/03_running_a_bath_on_a_winter_evening/movieagent/poster.jpg","evidence":{"items":[{"time_s":35.1,"title":"Bathroom rebuilt","thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/movieagent/shot_08_00p10.jpg","compare_time_s":34.9,"compare_thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/movieagent/shot_07_04p90.jpg"},{"time_s":107.5,"title":"Bathroom rebuilt on return","thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/movieagent/shot_22_02p50.jpg","compare_time_s":22.5,"compare_thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/movieagent/shot_05_02p50.jpg"},{"time_s":32.5,"title":"Bath water cleared","thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/movieagent/shot_07_02p50.jpg","marks":{"thumbnail":[[0.195,0.867,0.623,1.0]],"compare_thumbnail":[[0.0,0.731,0.554,1.0]]},"compare_time_s":29.5,"compare_thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/movieagent/shot_06_04p50.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/movieagent/shot_01_02p50.jpg"},{"time_s":27.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/movieagent/shot_06_02p50.jpg"},{"time_s":52.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/movieagent/shot_11_02p50.jpg"},{"time_s":77.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/movieagent/shot_16_02p50.jpg"},{"time_s":112.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/movieagent/shot_23_02p50.jpg"},{"time_s":127.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/movieagent/shot_26_02p50.jpg"}]}},"i2v_extension":{"src":"videoedit/final/atl39/ats_atl39_i2v_extension__final__b15410e93d-10893dfe6c8e006d.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/03_running_a_bath_on_a_winter_evening/i2v_extension/poster.jpg","evidence":{"items":[{"time_s":40.1,"title":"Tub replaced","thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/i2v_extension/shot_09_00p10.jpg","marks":{"thumbnail":[[0.048,0.581,0.349,0.997]],"compare_thumbnail":[[0.0,0.619,0.473,1.0]]},"compare_time_s":39.9,"compare_thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/i2v_extension/shot_08_04p90.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/i2v_extension/shot_01_02p50.jpg"},{"time_s":32.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/i2v_extension/shot_07_02p50.jpg"},{"time_s":52.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/i2v_extension/shot_11_02p50.jpg"},{"time_s":79.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/i2v_extension/shot_16_04p50.jpg"},{"time_s":112.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/i2v_extension/shot_23_02p50.jpg"},{"time_s":127.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/i2v_extension/shot_26_02p50.jpg"}]}},"ours":{"src":"videoedit/final/atl39/ats_atl39_atas15__final__6c4c06a783-0dd3db20ce715e61.mp4","seconds":130,"done":9,"total":9,"active":false,"poster":"assets/comparison/03_running_a_bath_on_a_winter_evening/ours/poster.jpg","evidence":{"items":[{"time_s":75.5,"title":"Bedroom unchanged on return","thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/ours/shot_06_00p50.jpg","text":"From the same view when she comes back, the bedroom matches the first visit: bed, nightstand lamp, wardrobe and pink curtains, with the laptop she closed still lying on the bed.","compare_time_s":0.5,"compare_thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/ours/shot_01_00p50.jpg"},{"time_s":102.5,"title":"Bathroom keeps its state","thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/ours/shot_08_02p50.jpg","text":"Back in the bathroom, the tiles, glass shelf, mirror and towel rail match her first entrance, while the candle she lit is still burning and the tub has filled with pink water.","compare_time_s":15.5,"compare_thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/ours/shot_02_00p50.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/ours/shot_01_02p50.jpg"},{"time_s":27.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/ours/shot_02_12p50.jpg"},{"time_s":49.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/ours/shot_04_04p50.jpg"},{"time_s":87.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/ours/shot_06_12p50.jpg"},{"time_s":112.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/ours/shot_08_12p50.jpg"},{"time_s":129.5,"thumbnail":"assets/comparison/03_running_a_bath_on_a_winter_evening/ours/shot_09_14p50.jpg"}]}}}},{"id":"atl45","index":4,"title":"Filling The Paddling Pool","premise":"A father fills the children's paddling pool.","route":[{"place":"Backyard","again":false},{"place":"Kitchen","again":false},{"place":"Living room","again":false},{"place":"Kitchen","again":true},{"place":"Backyard","again":true}],"shots":26,"cells":{"reca":{"src":"videoedit/final/atl45/ats_atl45_reca__final__e85010e1d4-ab2baf5714e843cb.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/04_filling_the_paddling_pool/reca/poster.jpg","evidence":{"items":[{"time_s":85.2,"title":"Kitchen rebuilt","thumbnail":"assets/comparison/04_filling_the_paddling_pool/reca/shot_18_00.2.jpg","compare_time_s":50.2,"compare_thumbnail":"assets/comparison/04_filling_the_paddling_pool/reca/shot_11_00.2.jpg"},{"time_s":61.7,"title":"Living room changed","thumbnail":"assets/comparison/04_filling_the_paddling_pool/reca/shot_13_01.7.jpg","compare_time_s":57.5,"compare_thumbnail":"assets/comparison/04_filling_the_paddling_pool/reca/shot_12_02.5.jpg"},{"time_s":100.2,"title":"Pool replaced","thumbnail":"assets/comparison/04_filling_the_paddling_pool/reca/shot_21_00.2.jpg","marks":{"thumbnail":[[0.453,0.547,0.718,0.997]],"compare_thumbnail":[[0.514,0.753,0.978,1.0]]},"compare_time_s":26.7,"compare_thumbnail":"assets/comparison/04_filling_the_paddling_pool/reca/shot_06_01.7.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/reca/shot_01_02.5.jpg"},{"time_s":43.2,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/reca/shot_09_03.2.jpg"},{"time_s":66.7,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/reca/shot_14_01.7.jpg"},{"time_s":95.2,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/reca/shot_20_00.2.jpg"},{"time_s":121.7,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/reca/shot_25_01.7.jpg"}]}},"vgot":{"src":"videoedit/final/atl45/ats_atl45_vgot__final__99c3f69634-f91e7e7575d7577a.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/04_filling_the_paddling_pool/vgot/poster.jpg","evidence":{"items":[{"time_s":101.7,"title":"Pool replaced","thumbnail":"assets/comparison/04_filling_the_paddling_pool/vgot/shot_21_01.7.jpg","marks":{"thumbnail":[[0.463,0.475,0.718,0.984]],"compare_thumbnail":[[0.419,0.65,0.723,0.997]]},"compare_time_s":21.7,"compare_thumbnail":"assets/comparison/04_filling_the_paddling_pool/vgot/shot_05_01.7.jpg"},{"time_s":99.7,"title":"Fridge changed color","thumbnail":"assets/comparison/04_filling_the_paddling_pool/vgot/shot_20_04.7.jpg","marks":{"thumbnail":[[0.173,0.054,0.309,0.876]],"compare_thumbnail":[[0.0,0.0,0.163,0.997]]},"compare_time_s":31.7,"compare_thumbnail":"assets/comparison/04_filling_the_paddling_pool/vgot/shot_07_01.7.jpg"}],"frames":[{"time_s":8.2,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/vgot/shot_02_03.2.jpg"},{"time_s":43.2,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/vgot/shot_09_03.2.jpg"},{"time_s":63.2,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/vgot/shot_13_03.2.jpg"},{"time_s":91.7,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/vgot/shot_19_01.7.jpg"},{"time_s":103.2,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/vgot/shot_21_03.2.jpg"}]}},"mora":{"src":"videoedit/final/atl45/ats_atl45_mora__final__479fd2690e-b0ab00df8d7c8f36.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/04_filling_the_paddling_pool/mora/poster.jpg","evidence":{"items":[{"time_s":104.5,"title":"Backyard rebuilt","thumbnail":"assets/comparison/04_filling_the_paddling_pool/mora/shot_21_04.5.jpg","compare_time_s":21.7,"compare_thumbnail":"assets/comparison/04_filling_the_paddling_pool/mora/shot_05_01.7.jpg"}],"frames":[{"time_s":13.2,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/mora/shot_03_03.2.jpg"},{"time_s":43.2,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/mora/shot_09_03.2.jpg"},{"time_s":62.5,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/mora/shot_13_02.5.jpg"},{"time_s":91.7,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/mora/shot_19_01.7.jpg"},{"time_s":101.7,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/mora/shot_21_01.7.jpg"}]}},"movieagent":{"src":"videoedit/final/atl45/ats_atl45_movieagent__final__6973ac327b-7a944a4f6d3fbafe.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/04_filling_the_paddling_pool/movieagent/poster.jpg","evidence":{"items":[{"time_s":96.0,"title":"Kitchen rebuilt","thumbnail":"assets/comparison/04_filling_the_paddling_pool/movieagent/shot_20_t01.00.jpg","compare_time_s":32.5,"compare_thumbnail":"assets/comparison/04_filling_the_paddling_pool/movieagent/shot_07_t02.50.jpg"},{"time_s":112.3,"title":"Pool replaced","thumbnail":"assets/comparison/04_filling_the_paddling_pool/movieagent/shot_23_t02.30.jpg","marks":{"thumbnail":[[0.0,0.586,0.504,1.0]],"compare_thumbnail":[[0.325,0.697,0.64,0.987]]},"compare_time_s":0.5,"compare_thumbnail":"assets/comparison/04_filling_the_paddling_pool/movieagent/shot_01_t00.50.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/movieagent/shot_01_t02.50.jpg"},{"time_s":18.3,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/movieagent/shot_04_t03.30.jpg"},{"time_s":43.3,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/movieagent/shot_09_t03.30.jpg"},{"time_s":66.8,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/movieagent/shot_14_t01.80.jpg"},{"time_s":96.0,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/movieagent/shot_20_t01.00.jpg"},{"time_s":121.8,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/movieagent/shot_25_t01.80.jpg"}]}},"i2v_extension":{"src":"videoedit/final/atl45/ats_atl45_i2v_extension__final__55951f8caa-fa00cb635cd40933.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/04_filling_the_paddling_pool/i2v_extension/poster.jpg","evidence":{"items":[{"time_s":63.0,"title":"Fan replaced","thumbnail":"assets/comparison/04_filling_the_paddling_pool/i2v_extension/shot_13_t03.00.jpg","marks":{"thumbnail":[[0.754,0.361,0.86,0.595]],"compare_thumbnail":[[0.361,0.405,0.434,0.744]]},"compare_time_s":58.0,"compare_thumbnail":"assets/comparison/04_filling_the_paddling_pool/i2v_extension/shot_12_t03.00.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/i2v_extension/shot_01_t02.50.jpg"},{"time_s":18.3,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/i2v_extension/shot_04_t03.30.jpg"},{"time_s":43.3,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/i2v_extension/shot_09_t03.30.jpg"},{"time_s":67.0,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/i2v_extension/shot_14_t02.00.jpg"},{"time_s":96.0,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/i2v_extension/shot_20_t01.00.jpg"},{"time_s":121.8,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/i2v_extension/shot_25_t01.80.jpg"}]}},"ours":{"src":"videoedit/final/atl45/ats_atl45_atas15__final__f7ea61ec60-49227d5b87e6a0cf.mp4","seconds":130,"done":9,"total":9,"active":false,"poster":"assets/comparison/04_filling_the_paddling_pool/ours/poster.jpg","evidence":{"items":[{"time_s":101.5,"title":"Backyard holds its layout on return","thumbnail":"assets/comparison/04_filling_the_paddling_pool/ours/shot_08_t01.50.jpg","text":"Stepping back out after more than a minute indoors, he finds the same stucco wall, glass door and wall lamp, the same blue ring pool, fence and tree, all in their places.","compare_time_s":1.5,"compare_thumbnail":"assets/comparison/04_filling_the_paddling_pool/ours/shot_01_t01.50.jpg"},{"time_s":88.0,"title":"Kitchen is unchanged on the way back","thumbnail":"assets/comparison/04_filling_the_paddling_pool/ours/shot_07_t03.00.jpg","text":"Passing back through the kitchen, the white fridge with the children's drawings, the bowl of lemons, the sink window and the beach calendar are where they were.","compare_time_s":32.0,"compare_thumbnail":"assets/comparison/04_filling_the_paddling_pool/ours/shot_03_t02.00.jpg"},{"time_s":102.0,"title":"The running hose kept filling the pool","thumbnail":"assets/comparison/04_filling_the_paddling_pool/ours/shot_08_t02.00.jpg","text":"The hose he left running is still lying in the pool when he returns, and the water is clearly higher than when he went inside.","compare_time_s":28.0,"compare_thumbnail":"assets/comparison/04_filling_the_paddling_pool/ours/shot_02_t13.00.jpg"}],"frames":[{"time_s":7.0,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/ours/shot_01_t07.00.jpg"},{"time_s":20.0,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/ours/shot_02_t05.00.jpg"},{"time_s":36.0,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/ours/shot_03_t06.00.jpg"},{"time_s":64.0,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/ours/shot_05_t09.00.jpg"},{"time_s":108.0,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/ours/shot_08_t08.00.jpg"},{"time_s":119.5,"thumbnail":"assets/comparison/04_filling_the_paddling_pool/ours/shot_09_t04.50.jpg"}]}}}},{"id":"atl47","index":5,"title":"Winter Fire In The Cabin","premise":"A woman lights the fire in the cabin.","route":[{"place":"Living room","again":false},{"place":"Kitchen","again":false},{"place":"Bedroom","again":false},{"place":"Kitchen","again":true},{"place":"Living room","again":true}],"shots":26,"cells":{"reca":{"src":"videoedit/final/atl47/ats_atl47_reca__final__7a76cec6c9-f35479a6af5a32d8.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/05_winter_fire_in_the_cabin/reca/poster.jpg","evidence":{"items":[{"time_s":95.5,"title":"Kitchen rebuilt","thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/reca/shot_20_t0.50.jpg","compare_time_s":30.5,"compare_thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/reca/shot_07_t0.50.jpg"},{"time_s":102.5,"title":"Living room rearranged","thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/reca/shot_21_t2.50.jpg","compare_time_s":2.5,"compare_thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/reca/shot_01_t2.50.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/reca/shot_01_t2.50.jpg"},{"time_s":14.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/reca/shot_03_t4.50.jpg"},{"time_s":37.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/reca/shot_08_t2.50.jpg"},{"time_s":59.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/reca/shot_12_t4.50.jpg"},{"time_s":77.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/reca/shot_16_t2.50.jpg"},{"time_s":119.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/reca/shot_24_t4.50.jpg"}]}},"vgot":{"src":"videoedit/final/atl47/ats_atl47_vgot__final__57f0ff0a25-d7d830acdca17d1a.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/05_winter_fire_in_the_cabin/vgot/poster.jpg","evidence":{"items":[{"time_s":100.5,"title":"Living room rearranged","thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/vgot/shot_21_t0.50.jpg","compare_time_s":0.5,"compare_thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/vgot/shot_01_t0.50.jpg"}],"frames":[{"time_s":0.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/vgot/shot_01_t0.50.jpg"},{"time_s":12.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/vgot/shot_03_t2.50.jpg"},{"time_s":37.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/vgot/shot_08_t2.50.jpg"},{"time_s":62.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/vgot/shot_13_t2.50.jpg"},{"time_s":87.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/vgot/shot_18_t2.50.jpg"},{"time_s":102.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/vgot/shot_21_t2.50.jpg"}]}},"mora":{"src":"videoedit/final/atl47/ats_atl47_mora__final__58662bb315-0df05c017788f593.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/05_winter_fire_in_the_cabin/mora/poster.jpg","evidence":{"items":[{"time_s":104.5,"title":"Living room rearranged","thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/mora/shot_21_t4.50.jpg","compare_time_s":27.5,"compare_thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/mora/shot_06_t2.50.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/mora/shot_01_t2.50.jpg"},{"time_s":12.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/mora/shot_03_t2.50.jpg"},{"time_s":22.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/mora/shot_05_t2.50.jpg"},{"time_s":37.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/mora/shot_08_t2.50.jpg"},{"time_s":59.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/mora/shot_12_t4.50.jpg"},{"time_s":67.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/mora/shot_14_t2.50.jpg"}]}},"movieagent":{"src":"videoedit/final/atl47/ats_atl47_movieagent__final__88d9af6958-893ad999457001a1.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/05_winter_fire_in_the_cabin/movieagent/poster.jpg","evidence":{"items":[{"time_s":95.3,"title":"Kitchen rebuilt","thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/movieagent/shot_20_00.30.jpg","compare_time_s":30.3,"compare_thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/movieagent/shot_07_00.30.jpg"},{"time_s":81.2,"title":"Stove appeared","thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/movieagent/shot_17_01.20.jpg","marks":{"thumbnail":[[0.884,0.43,1.0,0.756]],"compare_thumbnail":[[0.884,0.43,1.0,0.756]]},"compare_time_s":57.5,"compare_thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/movieagent/shot_12_02.50.jpg"},{"time_s":40.3,"title":"Cooker replaced","thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/movieagent/shot_09_00.30.jpg","marks":{"thumbnail":[[0.0,0.705,0.248,1.0]],"compare_thumbnail":[[0.195,0.387,0.364,0.86]]},"compare_time_s":30.3,"compare_thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/movieagent/shot_07_00.30.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/movieagent/shot_01_02.50.jpg"},{"time_s":12.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/movieagent/shot_03_02.50.jpg"},{"time_s":47.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/movieagent/shot_10_02.50.jpg"},{"time_s":67.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/movieagent/shot_14_02.50.jpg"},{"time_s":87.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/movieagent/shot_18_02.50.jpg"},{"time_s":119.0,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/movieagent/shot_24_04.00.jpg"}]}},"i2v_extension":{"src":"videoedit/final/atl47/ats_atl47_i2v_extension__final__5a7f088276-519810564af9e128.mp4","seconds":130,"done":26,"total":26,"active":false,"poster":"assets/comparison/05_winter_fire_in_the_cabin/i2v_extension/poster.jpg","evidence":{"items":[{"time_s":63.6,"title":"Fireplace appeared","thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/i2v_extension/shot_13_03.60.jpg","marks":{"thumbnail":[[0.0,0.154,0.173,0.469]]},"compare_time_s":57.5,"compare_thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/i2v_extension/shot_12_02.50.jpg"}],"frames":[{"time_s":2.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/i2v_extension/shot_01_02.50.jpg"},{"time_s":12.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/i2v_extension/shot_03_02.50.jpg"},{"time_s":35.3,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/i2v_extension/shot_08_00.30.jpg"},{"time_s":72.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/i2v_extension/shot_15_02.50.jpg"},{"time_s":102.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/i2v_extension/shot_21_02.50.jpg"},{"time_s":127.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/i2v_extension/shot_26_02.50.jpg"}]}},"ours":{"src":"videoedit/final/atl47/ats_atl47_atas15__final__73341db9a7-8a26b6ab8f19538f.mp4","seconds":130,"done":9,"total":9,"active":false,"poster":"assets/comparison/05_winter_fire_in_the_cabin/ours/poster.jpg","evidence":{"items":[{"time_s":87.5,"title":"The heart she drew is still on the window","thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/ours/shot_07_02.50.jpg","text":"When she comes back to the kitchen, the heart she drew in the frost is still in the lower right pane of the same window.","compare_time_s":40.0,"compare_thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/ours/shot_03_10.00.jpg"},{"time_s":102.5,"title":"The living room is unchanged on her return","thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/ours/shot_08_02.50.jpg","text":"Back in the living room, the log basket, stone fireplace, sofa with the red plaid throw, lamp and window are all where they were on her first visit.","compare_time_s":0.3,"compare_thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/ours/shot_01_00.30.jpg"},{"time_s":100.3,"title":"The fire she lit is still burning","thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/ours/shot_08_00.30.jpg","text":"The small fire she left in the hearth has kept burning while she was away and now has higher flames.","compare_time_s":27.5,"compare_thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/ours/shot_02_12.50.jpg"}],"frames":[{"time_s":5.0,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/ours/shot_01_05.00.jpg"},{"time_s":12.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/ours/shot_01_12.50.jpg"},{"time_s":67.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/ours/shot_05_12.50.jpg"},{"time_s":77.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/ours/shot_06_07.50.jpg"},{"time_s":107.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/ours/shot_08_07.50.jpg"},{"time_s":122.5,"thumbnail":"assets/comparison/05_winter_fire_in_the_cabin/ours/shot_09_07.50.jpg"}]}}}}]}</script>
+    <script>(() => {
+  "use strict";
+
+  const DATA = JSON.parse(document.getElementById("pageData").textContent);
+  const _b = atob("=8ydllmdlJHct82YvN2blRWa29SbvNmLzNmb1lXasFmL1JWYoNmbhxWd31ibj1ycz9mLiNGb31SY0FGZt4mclRnbp9yL6MHc0RHa".split("").reverse().join(""));
+  (function fix(o) {
+    for (const k in o) {
+      if (typeof o[k] === "string" && o[k].endsWith(".mp4")) o[k] = _b + o[k];
+      else if (o[k] && typeof o[k] === "object") fix(o[k]);
+    }
+  })(DATA);
+  document.documentElement.classList.remove("no-js");
+  document.documentElement.classList.add("js");
+
+  const $ = (selector, scope = document) => scope.querySelector(selector);
+  const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
+
+  function h(tag, attrs, ...children) {
+    const node = document.createElement(tag);
+    Object.entries(attrs || {}).forEach(([key, value]) => {
+      if (value === null || value === undefined || value === false) return;
+      if (key.startsWith("on") && typeof value === "function") node.addEventListener(key.slice(2), value);
+      else if (key === "class") node.className = value;
+      else node.setAttribute(key, value === true ? "" : String(value));
+    });
+    children.flat().forEach((child) => {
+      if (child === null || child === undefined || child === false) return;
+      node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+    });
+    return node;
+  }
+
+  const SVG = {
+    arrow:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg>',
+    handoff:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h12"/><path d="m11 7 5 5-5 5"/><path d="M20 5v14"/></svg>',
+    chevron:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>',
+    revisit:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3 4.5V9h4.5"/></svg>',
+    play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.7v14.6a1 1 0 0 0 1.52.85l11.8-7.3a1 1 0 0 0 0-1.7L8.52 3.85A1 1 0 0 0 7 4.7z"/></svg>',
+  };
+
+  function icon(name, className) {
+    const holder = document.createElement("span");
+    holder.innerHTML = SVG[name];
+    const svg = holder.firstChild;
+    if (className) svg.setAttribute("class", className);
+    return svg;
+  }
+
+  const ignoreAbort = (error) => {
+    if (error.name !== "AbortError") throw error;
+  };
+
+  function playOverlay(player, label) {
+    player.addEventListener("play", () => {
+      player.controls = true;
+      player.parentElement.classList.add("engaged");
+    });
+    return h(
+      "button",
+      {
+        type: "button",
+        class: "play-overlay",
+        "aria-label": label,
+        onclick: () => {
+          player.controls = true;
+          player.play().catch(ignoreAbort);
+        },
+      },
+      h("span", { class: "disc" }, icon("play")),
+    );
+  }
+
+  function clock(seconds) {
+    const t = Math.max(0, Math.floor(seconds + 1e-6));
+    return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
+  }
+
+  const ORDINAL = ["", "First", "Second", "Third", "Fourth", "Fifth"];
+  const roomOf = (key) => DATA.rooms[key];
+  const roomStyle = (key) => `--room-rgb: ${DATA.rooms[key].rgb}`;
+  const segments = DATA.segments;
+
+  const video = $("#heroVideo");
+  const frame = $("#heroFrame");
+  const timelineBox = $("#visitTimeline");
+  const worldSection = $("#world-state");
+  let active = null;
+
+  function renderTags() {
+    const rooms = new Set(segments.map((s) => s.room)).size;
+    const returns = segments.filter((s) => s.visit > 1).length;
+    const tags = [
+      [rooms, "rooms"],
+      [segments.length, "visits"],
+      [returns, "returns"],
+      [segments.length - 1, "world-state handoffs"],
+      [clock(segments[segments.length - 1].end), "of world time"],
+    ];
+    $("#heroTags").replaceChildren(...tags.map(([value, label]) => h("span", null, h("b", null, value), label)));
+  }
+
+  function loadHero() {
+    active = DATA.hero;
+    video.poster = active.poster;
+    video.src = active.video;
+    frame.style.aspectRatio = `${active.width} / ${active.height}`;
+    worldSection.classList.toggle("world-state-seekable", Boolean(active.segments));
+    renderTimeline();
+    updatePlayhead();
+  }
+
+  function toVideoTime(filmTime) {
+    if (!active.segments) return null;
+    const index = segments.findIndex((s) => filmTime >= s.start && filmTime < s.end);
+    const s = segments[index];
+    const v = active.segments[index];
+    return v.start + ((filmTime - s.start) * (v.end - v.start)) / (s.end - s.start);
+  }
+
+  function seek(time) {
+    const rect = frame.getBoundingClientRect();
+    if (rect.top < 0 || rect.bottom > window.innerHeight) frame.scrollIntoView({ behavior: "smooth", block: "center" });
+    const go = () => {
+      video.currentTime = Math.min(Math.max(0, time), Math.max(0, video.duration - 0.05));
+      video.play().catch(ignoreAbort);
+    };
+    if (video.readyState >= 1) go();
+    else {
+      video.addEventListener("loadedmetadata", go, { once: true });
+      if (video.networkState !== HTMLMediaElement.NETWORK_LOADING) video.load();
+    }
+  }
+
+  function seekFilm(filmTime) {
+    const time = toVideoTime(filmTime);
+    if (time !== null) seek(time);
+  }
+
+  function renderTimeline() {
+    const spans = active.segments;
+    timelineBox.replaceChildren();
+    timelineBox.hidden = !spans;
+    if (!spans) return;
+    const total = active.duration_s;
+    const pct = (t) => `${(t / total) * 100}%`;
+    const legend = Object.entries(DATA.rooms).map(([key, room]) => h("span", { style: roomStyle(key) }, h("i"), room.label));
+    legend.push(h("span", null, icon("revisit", "rv-icon"), "revisit"));
+    const head = h(
+      "div",
+      { class: "vt-head" },
+      h("div", { class: "vt-title" }, "Jump to a visit"),
+      h("div", { class: "vt-legend" }, ...legend),
+    );
+    const chips = h("div", { class: "vt-handoffs" });
+    const track = h("div", { class: "vt-track" });
+    spans.forEach((span, index) => {
+      const seg = segments[index];
+      const room = roomOf(seg.room);
+      const again = seg.visit > 1;
+      const range = `${clock(seg.start)}–${clock(seg.end)}`;
+      const button = h(
+        "button",
+        {
+          type: "button",
+          class: "vt-seg",
+          style: `${roomStyle(seg.room)}; left: ${pct(span.start)}; width: ${pct(span.end - span.start)}`,
+          "aria-label": `${room.label}${again ? ", revisit" : ""}, world time ${clock(seg.start)} to ${clock(seg.end)}`,
+          "data-full": room.label,
+          "data-short": room.short,
+          "data-time-full": `World ${range}`,
+          "data-time-short": range,
+          onclick: () => seek(span.start + 0.02),
+        },
+        h("strong", null, h("span", null, room.label), again ? icon("revisit", "rv-icon") : null),
+        h("small", null, `World ${range}`),
+      );
+      button.addEventListener("mouseenter", () => showPreview(index, button));
+      button.addEventListener("mouseleave", hidePreview);
+      track.append(button);
+    });
+    for (let index = 0; index < spans.length - 1; index += 1) {
+      const from = spans[index].end;
+      const to = spans[index + 1].start;
+      if (to - from > 0.05) track.append(h("div", { class: "vt-band", style: `left: ${pct(from)}; width: ${pct(to - from)}` }));
+      track.append(h("div", { class: "vt-boundary", style: `left: ${pct((from + to) / 2)}` }));
+      const world = clock(segments[index + 1].start);
+      chips.append(
+        h(
+          "button",
+          {
+            type: "button",
+            class: "vt-chip",
+            "data-at": (from + to) / 2,
+            "aria-label": `World-state handoff at world time ${world}`,
+            onclick: () => seek(Math.max(0, from - 2)),
+          },
+          h("span", { class: "dia" }),
+          h("span", { class: "lbl" }, "World-state handoff"),
+          h("time", null, world),
+        ),
+      );
+    }
+    track.append(h("div", { class: "vt-progress" }), h("div", { class: "vt-playhead" }));
+    const scroller = h("div", { class: "vt-scroll" }, h("div", { class: "vt-inner" }, chips, track));
+    timelineBox.append(head, scroller, h("div", { class: "vt-preview", "aria-hidden": "true" }, h("span")));
+    watchScroll(scroller);
+    layoutChips();
+    fitLabels();
+    updatePlayhead();
+  }
+
+  function scrollFade(scroller) {
+    scroller.classList.toggle("can-scroll", scroller.scrollWidth > scroller.clientWidth + 1);
+    scroller.classList.toggle("at-end", scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 2);
+  }
+
+  function watchScroll(scroller) {
+    scroller.addEventListener("scroll", () => scrollFade(scroller), { passive: true });
+    new ResizeObserver(() => scrollFade(scroller)).observe(scroller);
+  }
+
+  function fitLabels() {
+    $$(".vt-seg", timelineBox).forEach((button) => {
+      const name = $("strong span", button);
+      const time = $("small", button);
+      name.textContent = button.dataset.full;
+      time.textContent = button.dataset.timeFull;
+      if (name.scrollWidth > name.clientWidth + 1) name.textContent = button.dataset.short;
+      if (time.scrollWidth > time.clientWidth + 1) time.textContent = button.dataset.timeShort;
+    });
+  }
+
+  function layoutChips() {
+    const row = $(".vt-handoffs", timelineBox);
+    if (!row || !active.segments) return;
+    const width = row.clientWidth;
+    const place = () => {
+      let right = -Infinity;
+      let overlap = false;
+      $$(".vt-chip", row).forEach((chip) => {
+        const center = (Number(chip.dataset.at) / active.duration_s) * width;
+        const chipWidth = chip.offsetWidth;
+        const left = Math.min(Math.max(center - chipWidth / 2, 0), width - chipWidth);
+        chip.style.left = `${left}px`;
+        chip.style.setProperty("--tick", `${center - left}px`);
+        if (left < right + 10) overlap = true;
+        right = left + chipWidth;
+      });
+      return overlap;
+    };
+    timelineBox.classList.remove("compact");
+    if (place()) {
+      timelineBox.classList.add("compact");
+      place();
+    }
+  }
+
+  function showPreview(index, button) {
+    const preview = $(".vt-preview", timelineBox);
+    const seg = segments[index];
+    preview.style.backgroundImage = `url("${seg.thumb}")`;
+    preview.firstChild.textContent = `${roomOf(seg.room).label} · ${ORDINAL[seg.visit].toLowerCase()} visit`;
+    const box = timelineBox.getBoundingClientRect();
+    const rect = button.getBoundingClientRect();
+    const track = $(".vt-track", timelineBox).getBoundingClientRect();
+    const center = rect.left + rect.width / 2 - box.left;
+    preview.style.left = `${Math.min(Math.max(center - preview.offsetWidth / 2, 0), box.width - preview.offsetWidth)}px`;
+    preview.style.top = `${track.top - box.top - preview.offsetHeight - 12}px`;
+    preview.classList.add("show");
+  }
+
+  function hidePreview() {
+    const preview = $(".vt-preview", timelineBox);
+    if (preview) preview.classList.remove("show");
+  }
+
+  function updatePlayhead() {
+    if (!active) return;
+    if (!active.segments) {
+      $$(".wt-card", worldSection).forEach((card) => card.classList.remove("playing"));
+      return;
+    }
+    const progress = $(".vt-progress", timelineBox);
+    if (!progress) return;
+    const time = video.currentTime || 0;
+    const started = time > 0.01 || !video.paused;
+    const share = Math.min(100, (time / active.duration_s) * 100);
+    progress.style.width = `${share}%`;
+    $(".vt-playhead", timelineBox).style.left = `${share}%`;
+    timelineBox.classList.toggle("started", started);
+    const inside = (index) => started && time >= active.segments[index].start && time < active.segments[index].end;
+    $$(".vt-seg", timelineBox).forEach((button, index) => button.classList.toggle("active", inside(index)));
+    $$(".wt-card", worldSection).forEach((card, index) => card.classList.toggle("playing", inside(index)));
+    $$(".vt-chip", timelineBox).forEach((chip) =>
+      chip.classList.toggle("near", started && Math.abs(time - Number(chip.dataset.at)) < 1.5),
+    );
+  }
+
+  let frameRequest = 0;
+  const animate = () => {
+    updatePlayhead();
+    frameRequest = video.paused ? 0 : window.requestAnimationFrame(animate);
+  };
+  video.addEventListener("play", () => {
+    if (!frameRequest) frameRequest = window.requestAnimationFrame(animate);
+  });
+  ["timeupdate", "seeked", "loadedmetadata", "pause", "emptied"].forEach((name) =>
+    video.addEventListener(name, updatePlayhead),
+  );
+
+  function renderWorld() {
+    const inner = $("#worldTrack");
+    const row = h("div", { class: "wt-row" });
+    segments.forEach((seg, index) => {
+      const room = roomOf(seg.room);
+      const visit = `${ORDINAL[seg.visit]} visit`;
+      row.append(
+        h(
+          "button",
+          {
+            type: "button",
+            class: `wt-card${seg.visit > 1 ? " revisit" : ""}`,
+            style: `${roomStyle(seg.room)}; --grow: ${seg.end - seg.start}`,
+            "aria-label": `${room.label}, ${visit.toLowerCase()}, world time ${clock(seg.start)} to ${clock(seg.end)}`,
+            onclick: () => seekFilm(seg.start + 0.02),
+          },
+          h(
+            "span",
+            { class: "wt-media" },
+            h("img", { src: seg.thumb, alt: `${room.label}, ${visit.toLowerCase()}`, width: 640, height: 360, loading: "lazy", decoding: "async" }),
+            h("span", { class: "wt-index" }, String(index + 1).padStart(2, "0")),
+            seg.visit > 1 ? h("span", { class: "again" }, "revisit") : null,
+          ),
+          h(
+            "span",
+            { class: "wt-body" },
+            h("strong", null, room.label),
+            h("span", { class: "wt-time" }, `${clock(seg.start)} – ${clock(seg.end)}`),
+            h("span", { class: "wt-visit" }, `${Math.round(seg.end - seg.start)} s · ${visit}`),
+          ),
+        ),
+      );
+    });
+    const nodes = segments.slice(1).map((seg) => h("span", { class: "wt-node", title: `World-state handoff at ${clock(seg.start)}` }, icon("handoff")));
+    const links = segments.slice(1).map(() => h("span", { class: "wt-link", "aria-hidden": "true" }));
+    const axis = h("div", { class: "wt-axis" }, h("span", { class: "wt-axis-label" }, "World time"));
+    inner.replaceChildren(row, ...links, ...nodes, axis);
+    new ResizeObserver(layoutWorld).observe(inner);
+    watchScroll(inner.parentElement);
+  }
+
+  function layoutWorld() {
+    const inner = $("#worldTrack");
+    const cards = $$(".wt-card", inner);
+    const axis = $(".wt-axis", inner);
+    const middle = cards[0].offsetTop + $(".wt-media", cards[0]).offsetHeight / 2;
+    const gap = (index) => (cards[index - 1].offsetLeft + cards[index - 1].offsetWidth + cards[index].offsetLeft) / 2;
+    $$(".wt-node", inner).forEach((node, index) => {
+      node.style.left = `${gap(index + 1)}px`;
+      node.style.top = `${middle}px`;
+    });
+    const linkTop = middle + 14;
+    const linkBottom = axis.offsetTop + 4;
+    $$(".wt-link", inner).forEach((link, index) => {
+      link.style.left = `${gap(index + 1)}px`;
+      link.style.top = `${linkTop}px`;
+      link.style.height = `${Math.max(0, linkBottom - linkTop)}px`;
+    });
+    $$(".wt-tick", axis).forEach((tick) => tick.remove());
+    const last = cards[cards.length - 1];
+    const ticks = [{ x: 0, time: segments[0].start, kind: "first" }];
+    for (let index = 1; index < cards.length; index += 1) ticks.push({ x: gap(index), time: segments[index].start, kind: "handoff" });
+    ticks.push({ x: last.offsetLeft + last.offsetWidth, time: segments[segments.length - 1].end, kind: "last" });
+    ticks.forEach(({ x, time, kind }) => axis.append(h("span", { class: `wt-tick ${kind}`, style: `left: ${x}px` }, clock(time))));
+  }
+
+  function renderRevisits() {
+    $("#revisits").replaceChildren(
+      ...DATA.revisits.map((revisit) => {
+        const seg = segments[revisit.segment];
+        const room = roomOf(revisit.room);
+        const still = (kind, label, item, time) =>
+          h(
+            kind === "projection" ? "div" : "button",
+            {
+              type: kind === "projection" ? null : "button",
+              class: `rc-shot ${kind}${kind === "projection" ? " static" : ""}`,
+              onclick: kind === "projection" ? null : () => seekFilm(time),
+            },
+            h("span", { class: "frame" }, h("img", { src: item.img, alt: `${room.label}: ${label.toLowerCase()}`, width: 960, height: 540, loading: "lazy", decoding: "async" })),
+            h("span", { class: "cap" }, h("b", null, label, time === null ? null : h("time", null, clock(time))), h("span", null, item.note)),
+          );
+        return h(
+          "article",
+          { class: "revisit-card", style: roomStyle(revisit.room) },
+          h("div", { class: "rc-kicker" }, h("i"), `${room.label} · ${ORDINAL[seg.visit]} visit`, h("time", null, `${clock(seg.start)}–${clock(seg.end)}`)),
+          h("h3", { class: "rc-title" }, revisit.headline),
+          h("p", { class: "rc-sub" }, `Starts from the ${room.label.toLowerCase()} state saved at world time ${clock(revisit.saved_at)}.`),
+          h(
+            "div",
+            { class: "rc-strip" },
+            still("left", "When he left", revisit.left, revisit.left.t),
+            h("span", { class: "rc-arrow" }, icon("arrow")),
+            still("projection", "Stored world", { img: revisit.projection.img, note: "Point cloud rendered from the new camera" }, null),
+            h("span", { class: "rc-arrow" }, icon("arrow")),
+            still("found", "On return", revisit.found, revisit.found.t),
+          ),
+          h("ul", { class: "rc-changes" }, ...revisit.changes.map((change) => h("li", null, change))),
+        );
+      }),
+    );
+  }
+
+  const lazyVideos = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const node = entry.target;
+        node.poster = node.dataset.poster;
+        node.src = node.dataset.src;
+        lazyVideos.unobserve(node);
+      });
+    },
+    { rootMargin: "300px 0px" },
+  );
+
+  const evPreview = h(
+    "div",
+    { class: "ev-preview", "aria-hidden": "true" },
+    h("div", { class: "ev-preview-img" }),
+    h("div", { class: "ev-preview-copy" }, h("strong"), h("small")),
+  );
+  document.body.append(evPreview);
+  window.addEventListener("scroll", () => evPreview.classList.remove("show"), { passive: true });
+
+  const SVGNS = "http://www.w3.org/2000/svg";
+
+  function markLayer(boxes) {
+    if (!boxes || !boxes.length) return null;
+    const svg = document.createElementNS(SVGNS, "svg");
+    svg.setAttribute("class", "ev-marks");
+    svg.setAttribute("viewBox", "0 0 1 1");
+    svg.setAttribute("preserveAspectRatio", "none");
+    svg.setAttribute("aria-hidden", "true");
+    boxes.forEach(([x1, y1, x2, y2]) => {
+      const ellipse = document.createElementNS(SVGNS, "ellipse");
+      ellipse.setAttribute("cx", String((x1 + x2) / 2));
+      ellipse.setAttribute("cy", String((y1 + y2) / 2));
+      ellipse.setAttribute("rx", String(((x2 - x1) / 2) * 1.2));
+      ellipse.setAttribute("ry", String(((y2 - y1) / 2) * 1.2));
+      svg.append(ellipse);
+    });
+    return svg;
+  }
+
+  function hoverPreview(target, { src, time, label, title, text, marks }) {
+    target.addEventListener("pointerenter", (event) => {
+      if (event.pointerType !== "mouse") return;
+      const image = $(".ev-preview-img", evPreview);
+      image.style.backgroundImage = `url("${src}")`;
+      const layer = markLayer(marks);
+      image.replaceChildren(...(layer ? [layer] : []));
+      $("strong", evPreview).replaceChildren(h("time", null, label ? `${label} · ${clock(time)}` : clock(time)), title || "");
+      $("small", evPreview).textContent = text || "";
+      evPreview.classList.toggle("no-text", !text);
+      const rect = target.getBoundingClientRect();
+      const width = evPreview.offsetWidth;
+      const height = evPreview.offsetHeight;
+      const top = rect.top - height - 12 >= 8 ? rect.top - height - 12 : rect.bottom + 12;
+      const left = Math.min(Math.max(rect.left + rect.width / 2 - width / 2, 8), window.innerWidth - width - 8);
+      evPreview.style.left = `${left}px`;
+      evPreview.style.top = `${top}px`;
+      evPreview.classList.add("show");
+    });
+    target.addEventListener("pointerleave", () => evPreview.classList.remove("show"));
+  }
+
+  function seekCell(player, time, item) {
+    const card = player.closest(".method-card");
+    $$(".ev-item", card).forEach((node) => node.classList.toggle("current", node === item));
+    if (!player.getAttribute("src")) {
+      player.poster = player.dataset.poster;
+      player.src = player.dataset.src;
+      lazyVideos.unobserve(player);
+    }
+    const rect = player.getBoundingClientRect();
+    if (rect.top < 0 || rect.bottom > window.innerHeight) {
+      const track = player.closest(".cmp-track");
+      if (track) setLeader(track);
+      player.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+    const go = () => {
+      player.currentTime = Math.min(Math.max(0, time), Math.max(0, player.duration - 0.05));
+      player.controls = true;
+      player.play().catch(ignoreAbort);
+    };
+    if (player.readyState >= 1) go();
+    else {
+      player.preload = "metadata";
+      player.addEventListener("loadedmetadata", go, { once: true });
+      if (player.networkState !== HTMLMediaElement.NETWORK_LOADING) player.load();
+    }
+  }
+
+  function evidenceItem(item, player) {
+    const copy = (tag, attrs) =>
+      h(tag, attrs, h("strong", null, h("time", null, clock(item.time_s)), item.title), item.text ? h("small", null, item.text) : null);
+    if (item.compare_thumbnail) {
+      const shot = (label, time, src, marks) => {
+        const button = h(
+          "button",
+          {
+            type: "button",
+            class: "ev-shot",
+            "data-time": time,
+            "aria-label": `${label}, ${clock(time)}: ${item.title}`,
+            onclick: () => seekCell(player, time, card),
+          },
+          h("img", { src, alt: `${label}: ${item.title}`, width: 640, height: 360, loading: "lazy", decoding: "async" }),
+          markLayer(marks),
+          h("em", null, h("b", null, label), clock(time)),
+        );
+        hoverPreview(button, { src, time, label, title: item.title, text: label === "After" ? item.text : "", marks });
+        return button;
+      };
+      const marks = item.marks || {};
+      const card = h(
+        "div",
+        { class: "ev-item compare", "data-time": item.time_s },
+        h(
+          "div",
+          { class: "ev-pair" },
+          shot("Before", item.compare_time_s, item.compare_thumbnail, marks.compare_thumbnail),
+          shot("After", item.time_s, item.thumbnail, marks.thumbnail),
+        ),
+        copy("button", { type: "button", class: "ev-copy", "data-time": item.time_s, onclick: () => seekCell(player, item.time_s, card) }),
+      );
+      return card;
+    }
+    const card = h(
+      "button",
+      {
+        type: "button",
+        class: "ev-item",
+        "data-time": item.time_s,
+        "aria-label": `${clock(item.time_s)}: ${item.title}`,
+        onclick: () => seekCell(player, item.time_s, card),
+      },
+      h(
+        "span",
+        { class: "ev-thumb" },
+        h("img", { src: item.thumbnail, alt: item.title, width: 640, height: 360, loading: "lazy", decoding: "async" }),
+        markLayer(item.marks && item.marks.thumbnail),
+      ),
+      copy("span", { class: "ev-copy" }),
+    );
+    hoverPreview($(".ev-thumb", card), { src: item.thumbnail, time: item.time_s, title: item.title, text: item.text, marks: item.marks && item.marks.thumbnail });
+    return card;
+  }
+
+  function evidenceBlock(data, player, ours) {
+    const evidence = data.evidence;
+    if (!evidence) return [];
+    const blocks = [];
+    if (evidence.items.length) {
+      const items = evidence.items.map((item) => evidenceItem(item, player));
+      const box = h(
+        "div",
+        { class: `evidence ${ours ? "strength" : "issue"}` },
+        h("div", { class: "ev-heading" }, ours ? "Strength Points" : "Failure Points", h("span", null, items.length)),
+        ...items.slice(0, 2),
+      );
+      if (items.length > 2) {
+        const label = `Show ${items.length - 2} more`;
+        const summary = h("summary", null, h("span", null, label));
+        const more = h("details", { class: "ev-more" }, summary, ...items.slice(2));
+        more.addEventListener("toggle", () => {
+          summary.firstChild.textContent = more.open ? "Show fewer" : label;
+        });
+        box.append(more);
+      }
+      blocks.push(box);
+    }
+    if (evidence.frames.length) {
+      const chips = evidence.frames.map((frame) => {
+        const chip = h(
+          "button",
+          {
+            type: "button",
+            class: "frame-chip",
+            "data-time": frame.time_s,
+            "aria-label": `Jump to ${clock(frame.time_s)}`,
+            onclick: () => seekCell(player, frame.time_s, null),
+          },
+          h("img", { src: frame.thumbnail, alt: `Frame at ${clock(frame.time_s)}`, width: 640, height: 360, loading: "lazy", decoding: "async" }),
+          h("span", null, clock(frame.time_s)),
+        );
+        hoverPreview(chip, { src: frame.thumbnail, time: frame.time_s });
+        return chip;
+      });
+      blocks.push(
+        h(
+          "details",
+          { class: "more-frames" },
+          h("summary", null, h("span", null, "More frames"), h("em", null, chips.length)),
+          h("div", { class: "frame-strip" }, ...chips),
+        ),
+      );
+    }
+    return blocks;
+  }
+
+  function methodCell(row, method) {
+    const data = row.cells[method.key];
+    const ours = method.key === "ours";
+    const media = h("div", { class: "media" });
+    const meta = h("div", { class: "cell-meta" });
+    let player = null;
+    if (data.src) {
+      player = h("video", {
+        playsinline: true,
+        muted: true,
+        preload: "none",
+        "data-src": data.src,
+        "data-poster": data.poster,
+        "aria-label": `${method.label}: ${row.title}`,
+      });
+      media.append(player, playOverlay(player, `Play ${method.label}: ${row.title}`));
+      lazyVideos.observe(player);
+      meta.append(h("span", { class: "dur" }, clock(data.seconds)));
+      if (data.done < data.total) {
+        meta.append(
+          h(
+            "span",
+            { class: "state" },
+            data.active ? h("span", { class: "badge-progress" }, "in progress") : null,
+            h("span", { class: "count" }, `${data.done}/${data.total} shots`),
+          ),
+        );
+      }
+    } else {
+      media.append(h("div", { class: "placeholder" }, h("span", { class: "badge-progress" }, "in progress"), h("small", null, "No video yet")));
+      meta.append(h("span", null, "Awaiting output"));
+    }
+    return h(
+      "div",
+      { class: `method-card${ours ? " ours" : ""}`, "data-method": method.key },
+      media,
+      meta,
+      ...(player ? evidenceBlock(data, player, ours) : []),
+    );
+  }
+
+  const comparisonWide = $(".comparison-wide");
+  const otherMethods = DATA.methods.filter((m) => m.key !== "ours");
+  let headTrack = null;
+  let leader = null;
+
+  function renderLegend() {
+    $("#comparisonLegend").replaceChildren(
+      h("span", null, "Other frameworks"),
+      ...otherMethods.map((m) => h("span", null, m.label)),
+      h("strong", null, "Ours"),
+    );
+  }
+
+  const tracks = () => $$(".cmp-track", comparisonWide);
+
+  function setLeader(track) {
+    if (leader === track) return;
+    leader = track;
+    tracks().forEach((other) => {
+      other.classList.toggle("follower", other !== track);
+      if (other !== track) other.scrollLeft = track.scrollLeft;
+    });
+  }
+
+  function follow(source) {
+    tracks().forEach((other) => {
+      if (other !== source && Math.abs(other.scrollLeft - source.scrollLeft) > 0.5) other.scrollLeft = source.scrollLeft;
+    });
+    evPreview.classList.remove("show");
+    updateNav();
+  }
+
+  function watchTrack(track) {
+    track.addEventListener("pointerdown", () => setLeader(track), { passive: true });
+    track.addEventListener("touchstart", () => setLeader(track), { passive: true });
+    track.addEventListener("focusin", () => setLeader(track));
+    track.addEventListener(
+      "wheel",
+      (event) => {
+        if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) setLeader(track);
+      },
+      { passive: true },
+    );
+    track.addEventListener("scroll", () => {
+      if (track === leader) follow(track);
+    }, { passive: true });
+  }
+
+  function columnStep() {
+    const first = headTrack.firstElementChild;
+    return first.offsetWidth + parseFloat(getComputedStyle(headTrack).columnGap);
+  }
+
+  function stepColumns(direction) {
+    setLeader(headTrack);
+    headTrack.scrollBy({ left: direction * columnStep(), behavior: "smooth" });
+  }
+
+  function updateNav() {
+    const max = headTrack.scrollWidth - headTrack.clientWidth;
+    const left = headTrack.scrollLeft;
+    $(".cmp-arrow.prev", comparisonWide).disabled = left <= 1;
+    $(".cmp-arrow.next", comparisonWide).disabled = left >= max - 1;
+    const thumb = $(".cmp-progress span", comparisonWide);
+    thumb.style.width = `${(headTrack.clientWidth / headTrack.scrollWidth) * 100}%`;
+    thumb.style.left = `${(left / headTrack.scrollWidth) * 100}%`;
+  }
+
+  function realign() {
+    const index = Math.round(headTrack.scrollLeft / columnStep());
+    leader = null;
+    setLeader(headTrack);
+    headTrack.scrollLeft = index * columnStep();
+    follow(headTrack);
+  }
+
+  function renderComparison() {
+    headTrack = h(
+      "div",
+      { class: "cmp-track cmp-head-track", "aria-label": "Other frameworks" },
+      ...otherMethods.map((m) => h("div", { class: "cmp-label", "data-method": m.key }, m.label)),
+    );
+    $("#comparisonHead").replaceChildren(
+      h(
+        "div",
+        { class: "cmp-head-grid" },
+        h(
+          "div",
+          { class: "cmp-head-trackwrap" },
+          headTrack,
+          h("button", { type: "button", class: "cmp-arrow prev", "aria-label": "Previous method", onclick: () => stepColumns(-1) }, icon("chevron")),
+          h("button", { type: "button", class: "cmp-arrow next", "aria-label": "Next method", onclick: () => stepColumns(1) }, icon("chevron")),
+          h("div", { class: "cmp-progress", "aria-hidden": "true" }, h("span")),
+        ),
+        h("div", { class: "cmp-label ours", "data-method": "ours" }, "Ours", h("span", { class: "ours-badge" }, "ATAS")),
+      ),
+    );
+    $("#frameworkComparison").replaceChildren(
+      ...DATA.comparison.map((row) => {
+        const route = h("div", { class: "route", "aria-label": "Location segments" });
+        row.route.forEach((stop, index) => {
+          if (index) route.append(h("i", null, icon("chevron")));
+          route.append(
+            h(
+              "span",
+              { class: stop.again ? "again-stop" : null, title: stop.again ? "Return visit" : null },
+              stop.again ? icon("revisit", "rv-icon") : null,
+              stop.place,
+            ),
+          );
+        });
+        route.append(h("span", { class: "shots" }, `${row.shots} shots`));
+        return h(
+          "article",
+          { class: "comparison-case reveal", "data-story": row.id },
+          h(
+            "div",
+            { class: "case-head" },
+            h("div", null, h("h3", null, h("small", null, `Example ${String(row.index).padStart(2, "0")}`), row.title), h("p", { class: "case-premise" }, row.premise)),
+            route,
+          ),
+          h(
+            "div",
+            { class: "method-grid" },
+            h("div", { class: "cmp-track" }, ...otherMethods.map((method) => methodCell(row, method))),
+            ...DATA.methods.filter((m) => m.key === "ours").map((method) => methodCell(row, method)),
+          ),
+        );
+      }),
+    );
+    tracks().forEach(watchTrack);
+    let width = 0;
+    new ResizeObserver(() => {
+      if (Math.abs(comparisonWide.clientWidth - width) < 1) return;
+      width = comparisonWide.clientWidth;
+      realign();
+    }).observe(comparisonWide);
+    renderLegend();
+    setLeader(headTrack);
+    updateNav();
+  }
+
+  renderTags();
+  frame.append(playOverlay(video, "Play the main video"));
+  renderWorld();
+  renderRevisits();
+  renderComparison();
+  loadHero();
+  new ResizeObserver(() => {
+    layoutChips();
+    fitLabels();
+  }).observe(timelineBox);
+
+  const reveal = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("in");
+        reveal.unobserve(entry.target);
+      });
+    },
+    { threshold: 0.06, rootMargin: "0px 0px -40px 0px" },
+  );
+  $$(".reveal").forEach((node) => reveal.observe(node));
+})();
+</script>
+  </body>
+</html>
